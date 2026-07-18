@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Ephemeris :: ephemeris.html :: v1.6.2 -->
+<!-- Ephemeris :: ephemeris.html :: v1.7.0 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -514,7 +514,7 @@ svg.chart{width:100%;height:auto;display:block;background:var(--panel2);border:1
 <script>
 "use strict";
 /* ==========================================================================
-   EPHEMERIS  FI-117  v1.6.2
+   EPHEMERIS  FI-117  v1.7.0
    Local first menstrual cycle record. Runs from disk. No network, ever.
    Storage holds two padded, independently keyed volumes and nothing else.
    Passphrase to key is Argon2id, written out below and checked against
@@ -829,7 +829,7 @@ function argon2id(pwd, salt, { t = 3, m = 65536, p = 1, dkLen = 32 } = {}) {
 
 
 /* ---------- constants and state ---------- */
-const VER = "1.6.2";
+const VER = "1.7.0";
 const MAGIC = "EPHEMERIS1";
 const STORE_KEY = "eph.v1";
 const PAD_BLOCK = 16384;
@@ -840,14 +840,26 @@ const ENC_INFO = "eph-enc-v2", VFY_INFO = "eph-vfy-v2", WIPE_INFO = "eph-wipe-v2
 const S = {
   key: null, slot: null, data: null, salt: null, target: PAD_MIN,
   file: null, memoryOnly: false, debug: false,
-  selDate: null, calMonth: null, idleTimer: null, painting: null, paintVal: 0
+  selDate: null, calMonth: null, idleTimer: null, painting: null, paintVal: 0, undo: null
 };
 
 const $ = (id) => document.getElementById(id);
 const el = (t, a, kids) => { const n = document.createElement(t); if (a) for (const k in a) { if (k === "text") n.textContent = a[k]; else n.setAttribute(k, a[k]); } if (kids) kids.forEach(c => n.appendChild(c)); return n; };
 function dbg(...m) { if (!S.debug) return; const L = $("log"); if (!L) return; L.textContent += m.join(" ") + "\n"; L.scrollTop = L.scrollHeight; }
 let toastT = null;
-function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.remove("hide"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.add("hide"), 2600); }
+function toast(msg, action) {
+  const t = $("toast");
+  t.textContent = "";
+  t.appendChild(el("span", { text: msg }));
+  if (action) {
+    const b = el("button", { type: "button", text: action.label, style: "margin-left:.8em;min-height:34px;padding:.15em .9em;font-size:.9em" });
+    b.addEventListener("click", () => { t.classList.add("hide"); action.run(); });
+    t.appendChild(b);
+  }
+  t.classList.remove("hide");
+  clearTimeout(toastT);
+  toastT = setTimeout(() => t.classList.add("hide"), action ? 9000 : 2600);
+}
 const te = (s) => new TextEncoder().encode(s);
 
 const b64 = {
@@ -1226,6 +1238,29 @@ function setDay(iso, patch) {
   d[iso] = Object.assign({ f: 0, s: {}, n: "" }, d[iso] || {}, patch);
   S.data.days = d;
 }
+/* One step of undo, for the writes that happen faster than thought: the quick
+   bar, painting a run across the calendar, filling in from memory, and bringing
+   a record in. Days that did not exist before are removed again rather than
+   left behind as empty entries. */
+function remember(isos, label) {
+  const d = days(), before = {};
+  isos.forEach(iso => { before[iso] = d[iso] ? JSON.parse(JSON.stringify(d[iso])) : null; });
+  S.undo = { label, before };
+}
+async function undoLast() {
+  if (!S.undo) { toast("Nothing to undo"); return; }
+  const d = days();
+  for (const iso in S.undo.before) {
+    const prev = S.undo.before[iso];
+    if (prev === null) delete d[iso]; else d[iso] = prev;
+  }
+  S.data.days = d;
+  const what = S.undo.label;
+  S.undo = null;
+  await persist(); refresh();
+  if (S.selDate) selectDay(S.selDate);
+  toast(what + " undone");
+}
 function dayHasMarks(r) {
   if (!r) return false;
   if (r.t != null || r.m != null || r.l != null) return true;
@@ -1508,9 +1543,11 @@ async function endPaint() {
   if (!p || !p.moved || !p.to) return;
   const a = p.from < p.to ? p.from : p.to, b = p.from < p.to ? p.to : p.from;
   const n = D.diff(a, b) + 1;
-  for (let i = 0; i < n; i++) setDay(D.add(a, i), { f: 3, x: false });
+  const isos = Array.from({ length: n }, (_, i) => D.add(a, i));
+  remember(isos, "Those days");
+  isos.forEach(iso => setDay(iso, { f: 3, x: false }));
   await persist(); refresh(); selectDay(a);
-  toast(n + " days marked");
+  toast(n + " days marked", { label: "Undo", run: undoLast });
 }
 function buildEditor() {
   const f = $("edFlow"); f.innerHTML = "";
@@ -1576,16 +1613,22 @@ async function archiveDay() {
    two buttons exist only because they are what people reach for. */
 async function quick(kind) {
   const t = D.today();
+  const undo = { label: "Undo", run: undoLast };
   if (kind === "start" || kind === "today") {
-    setDay(t, { f: 3, x: false, r: false });
-    toast(kind === "start" ? "Marked as started today" : "Marked bleeding today");
+    const had = dayOf(t);
+    remember([t], "That mark");
+    /* a heavier reading already recorded by hand is not overwritten by a tap */
+    const f = had && had.f > 3 && !had.x ? had.f : 3;
+    setDay(t, { f, x: false, r: false });
+    toast(kind === "start" ? "Marked as started today" : "Marked bleeding today", undo);
   }
   if (kind === "end") {
     let last = null;
     for (let i = 0; i <= 12; i++) { const iso = D.add(t, -i); const r = dayOf(iso); if (r && r.f > 0 && !r.x) { last = iso; break; } }
     if (!last) { toast("Nothing recent to close off"); return; }
+    remember([last], "That mark");
     setDay(last, { f: Math.min(dayOf(last).f, 1) });
-    toast("Closed off at " + D.human(last));
+    toast("Closed off at " + D.human(last) + ", marked as tailing off", undo);
   }
   S.calMonth = t.slice(0, 7);
   await persist(); refresh(); selectDay(t);
@@ -1596,6 +1639,16 @@ async function backfill() {
   if (!last || !/^\d{4}-\d{2}-\d{2}$/.test(last)) { st.className = "err"; st.textContent = "Enter the most recent start you remember."; return; }
   if (!(len >= 15 && len <= 90) || !(bd >= 1 && bd <= 14) || !(count >= 1 && count <= 24)) { st.className = "err"; st.textContent = "Check the numbers. Length 15 to 90, bleeding days 1 to 14, up to 24 cycles."; return; }
   let made = 0;
+  const touched = [];
+  for (let c = 0; c < count; c++) {
+    const start = D.add(last, -len * c);
+    for (let i = 0; i < bd; i++) {
+      const iso = D.add(start, i);
+      if (dayOf(iso)) continue;
+      touched.push(iso);
+    }
+  }
+  remember(touched, "That fill in");
   for (let c = 0; c < count; c++) {
     const start = D.add(last, -len * c);
     for (let i = 0; i < bd; i++) {
@@ -1608,7 +1661,7 @@ async function backfill() {
   await persist(); refresh();
   st.className = "dim";
   st.textContent = made + " days filled in from memory across " + count + " cycles. They are marked as recalled and count for less.";
-  toast("Filled in " + count + " cycles");
+  toast("Filled in " + count + " cycles", { label: "Undo", run: undoLast });
 }
 
 /* ---------- signals ---------- */
@@ -1994,6 +2047,7 @@ function offerImport(found, what) {
 async function commitImport() {
   const found = IMP.pending || [];
   let made = 0, already = 0;
+  remember(found.filter(f => !dayOf(f.iso)).map(f => f.iso), "That import");
   found.forEach(f => {
     if (dayOf(f.iso)) { already++; return; }
     setDay(f.iso, { f: f.flow, r: true, x: false });
@@ -2007,7 +2061,7 @@ async function commitImport() {
   const st = $("impState");
   st.className = "dim";
   st.textContent = made + " days brought in and marked as recalled. " + already + " were already in the record and were left alone. Cycle starts were worked out from the bleeding days.";
-  toast(made + " days brought in");
+  toast(made + " days brought in", { label: "Undo", run: undoLast });
 }
 function cancelImport() {
   IMP.pending = null; IMP.csv = null;
@@ -2521,7 +2575,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("visibilitychange", () => { if (document.hidden && S.key && S.data && S.data.prefs && S.data.prefs.lockOnBlur) lock(); });
   boot();
 });
-window.__eph = { S, D, cycles, stats, predict, trends, placement, strength, selfTest, unlock, createRecord, lock, setDay, persist, deriveAll, sameVfy, blankRecord, seedDecoy, upkeepDecoy, rawRead, destroySlot, splitCsvLine, argon2id, startOver, askClear, resolveTheme, cycleTheme, paintTheme, longestReadableRun, DRAW, STATIONS, showStation, current, ensureDay, flowFromValue, isoFromValue, daysFromJson, daysFromHealthXml, rowsFromCsv, guessCols, paperHtml, commitImport, IMP, blake2b, backfill, quick };
+window.__eph = { S, D, cycles, stats, predict, trends, placement, strength, selfTest, unlock, createRecord, lock, setDay, persist, deriveAll, sameVfy, blankRecord, seedDecoy, upkeepDecoy, rawRead, destroySlot, splitCsvLine, argon2id, undoLast, remember, startOver, askClear, resolveTheme, cycleTheme, paintTheme, longestReadableRun, DRAW, STATIONS, showStation, current, ensureDay, flowFromValue, isoFromValue, daysFromJson, daysFromHealthXml, rowsFromCsv, guessCols, paperHtml, commitImport, IMP, blake2b, backfill, quick };
 </script>
 </body>
 </html>

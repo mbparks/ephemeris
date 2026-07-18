@@ -1,6 +1,6 @@
 # EPHEMERIS
 
-**Field Instrument FI-117 :: v1.6.2**
+**Field Instrument FI-117 :: v1.7.0**
 
 A private cycle record that runs from the file itself. No account, no server, no company, no network. One HTML file on your own device.
 
@@ -29,6 +29,8 @@ Below the dial: where today sits in the distribution. Not a red counter of days 
 
 ### Log
 A month calendar and a day sheet. Flow on a five point scale, symptoms on a four point scale, medication, tests, and a note. Hold and drag across the calendar to mark a run of days at once. The quick bar handles the common case in one tap: **started today**, **bleeding today**, **it stopped**.
+
+Anything written in a hurry can be taken back. The quick bar, painting a run of days, filling in from memory, and bringing a record in all offer a single step of undo in the message that confirms them, and undoing restores exactly what was there before. A mark corrected by hand works too: pick the day, set bleeding to none, save. Cycle starts, the dial, the predictions and the trends are all worked out fresh from the days each time you open the app, so correcting a day corrects everything derived from it.
 
 **Fill in earlier cycles** seeds history from memory. Anything entered that way is marked as recalled, drawn with a dotted edge, weighted lower in the arithmetic, and labelled as such in the cycle table. Memory is not observation and the instrument does not pretend otherwise.
 
@@ -133,7 +135,7 @@ Neither Clue nor Flo records where a cycle started, so starts are derived here f
 
 Record station, **Run self test**. 60 checks covering the hand written cryptography against published test vectors, the sealing and padding, the wipe, date arithmetic across month ends and leap days, cycle detection, prediction behaviour at one cycle and at twelve, trend detection, the passphrase meter, the importers against Clue shaped, Flo shaped, tabular and Apple Health input, the paper log measurements, and a check that nothing readable ever reaches storage.
 
-A browser harness of 90 further checks covers setup, unlock under each passphrase, the attempt delay, the wipe, the untouched timer, and the second record being carried forward.
+A browser harness of 101 further checks covers setup, unlock under each passphrase, the attempt delay, the wipe, the untouched timer, and the second record being carried forward.
 
 ---
 

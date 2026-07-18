@@ -3,6 +3,26 @@
 Ephemeris, Field Instrument FI-117. Versions are marked in the file itself
 (`<!-- Ephemeris :: ephemeris.html :: vX.Y.Z -->`) and in the About station.
 
+## v1.7.0
+
+Marks made in a hurry can be taken back.
+
+- **One step of undo** on everything that writes days faster than thought: the
+  quick bar, painting a run across the calendar, filling in from memory, and
+  bringing a record in. The offer appears in the message that confirms the
+  write and stays for nine seconds.
+- Undo restores exactly what was there. A day that did not exist before the
+  mark is removed again rather than left behind as an empty entry.
+- **A tap no longer overwrites a heavier reading entered by hand.** Bleeding
+  today used to write medium over a day already marked heavy. It now leaves the
+  heavier reading alone.
+- It stopped now says what it did: the day is marked as tailing off rather than
+  silently downgraded.
+- Corrections by hand still work as before, in the Log: pick the day, set
+  bleeding to none, save. Everything derived from the record, the cycle starts,
+  the dial, the predictions and the trends, is worked out fresh at read time, so
+  a corrected day corrects all of it at once.
+
 ## v1.6.2
 
 - The line under the wordmark reads "a record of your own" rather than "tables

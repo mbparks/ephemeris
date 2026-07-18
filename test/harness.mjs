@@ -199,6 +199,42 @@ console.log('\n-- workflows --');
   ok('saving with no day picked writes to today instead of refusing', (w.__eph.S.data.days[w.__eph.D.today()] || {}).n === 'noted without picking a day first');
 }
 
+console.log('\n-- undoing a mark made by accident --');
+{
+  w.localStorage.clear(); w.__ephMem = null; w.__eph.lock();
+  $('pp1').value = REAL; $('pp2').value = REAL; $('ppd').value = ''; $('setKdf').value = '16';
+  await w.__eph.createRecord(); await settle(200);
+  const D2 = w.__eph.D, today = D2.today();
+
+  await w.__eph.quick('start'); await settle(150);
+  ok('a quick mark writes today', (w.__eph.S.data.days[today] || {}).f === 3);
+  ok('the toast offers a way back', /undo/i.test($('toast').textContent));
+  await w.__eph.undoLast(); await settle(150);
+  ok('undoing a mark on a day that had nothing removes the day entirely', !w.__eph.S.data.days[today]);
+
+  w.__eph.setDay(today, { f: 4, n: 'heavy, and noted by hand' });
+  await w.__eph.persist();
+  await w.__eph.quick('today'); await settle(150);
+  ok('a tap does not overwrite a heavier reading entered by hand', w.__eph.S.data.days[today].f === 4);
+  ok('a tap leaves the note alone', w.__eph.S.data.days[today].n === 'heavy, and noted by hand');
+
+  await w.__eph.quick('end'); await settle(150);
+  ok('closing off marks the day as tailing off', w.__eph.S.data.days[today].f === 1);
+  await w.__eph.undoLast(); await settle(150);
+  ok('undoing a close off puts the reading back exactly', w.__eph.S.data.days[today].f === 4 && w.__eph.S.data.days[today].n === 'heavy, and noted by hand');
+
+  const before = Object.keys(w.__eph.S.data.days).length;
+  w.__eph.IMP.pending = [{ iso: '2023-04-01', flow: 3 }, { iso: '2023-04-02', flow: 2 }];
+  await w.__eph.commitImport(); await settle(200);
+  ok('an import writes its days', Object.keys(w.__eph.S.data.days).length === before + 2);
+  await w.__eph.undoLast(); await settle(200);
+  ok('an import can be taken back in one step', Object.keys(w.__eph.S.data.days).length === before);
+
+  await w.__eph.undoLast(); await settle(100);
+  ok('undoing twice says there is nothing left rather than misbehaving', /nothing to undo/i.test($('toast').textContent));
+  ok('the record survives all of that', w.__eph.S.data.days[today].f === 4);
+}
+
 console.log('\n-- the look --');
 {
   w.localStorage.clear(); w.__ephMem = null; w.__eph.lock();
