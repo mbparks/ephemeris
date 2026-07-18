@@ -3,6 +3,17 @@
 Ephemeris, Field Instrument FI-117. Versions are marked in the file itself
 (`<!-- Ephemeris :: ephemeris.html :: vX.Y.Z -->`) and in the About station.
 
+## v1.7.1
+
+- Controls in a row line up again. Each cell in a form row is a column now,
+  with its control pinned to the bottom, so a label that wraps to two lines no
+  longer pushes its box below its neighbours.
+- Shortened the labels that were wrapping in the first place. Lock when the app
+  leaves the screen became lock when hidden, blank rows to carry on with became
+  blank rows, and so on down the forms.
+- The harness fails the release if any label in a form row grows past 24
+  characters, or if the alignment rules go missing.
+
 ## v1.7.0
 
 Marks made in a hurry can be taken back.

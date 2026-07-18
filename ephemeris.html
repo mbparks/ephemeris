@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Ephemeris :: ephemeris.html :: v1.7.0 -->
+<!-- Ephemeris :: ephemeris.html :: v1.7.1 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -67,7 +67,13 @@ h1{font-size:1.6rem}h2{font-size:1.25rem}h3{font-size:1.02rem}
 .card{background:var(--panel);border:1px solid var(--rule);border-radius:var(--r);padding:var(--gap);margin:0 0 var(--gap);box-shadow:var(--lift)}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
 .row>*{flex:1 1 160px}
-.grid2{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.grid2{display:grid;gap:12px 14px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));align-items:stretch}
+/* a label that wraps to two lines used to push its control below the others.
+   each cell is a column now, with the control pinned to the bottom, so a row
+   of controls lines up whatever the labels do. */
+.grid2>div,.row>div{display:flex;flex-direction:column;min-width:0}
+.grid2>div>:last-child,.row>div>:last-child{margin-top:auto}
+.grid2 label,.row label{min-height:1.2em}
 .eyebrow{font-family:var(--data);font-size:.7rem;letter-spacing:.24em;text-transform:uppercase;color:var(--brass)}
 .eyebrow::after{content:"";display:block;width:34px;height:1px;margin:.45em 0 .1em;background:linear-gradient(to right,var(--brass),transparent)}
 .rule{height:1px;background:linear-gradient(to right,transparent,var(--rule) 18%,var(--rule) 82%,transparent);margin:var(--gap) 0;border:0}
@@ -193,7 +199,7 @@ svg.chart{width:100%;height:auto;display:block;background:var(--panel2);border:1
       <p class="dim" style="font-size:.85em;margin:.2em 0 .5em">Opens a separate, ordinary looking record. If you are ever made to unlock this, that is the one you can open. Both records exist on disk either way and neither reveals the other.</p>
       <input id="ppd" type="password" autocomplete="new-password" spellcheck="false">
       <div class="rule"></div>
-      <label for="setKdf">How hard to make guessing</label>
+      <label for="setKdf">Guessing difficulty</label>
       <select id="setKdf">
         <option value="16">gentle, for an older phone</option>
         <option value="64" selected>standard</option>
@@ -296,10 +302,10 @@ svg.chart{width:100%;height:auto;display:block;background:var(--panel2);border:1
     <h3>Fill in earlier cycles</h3>
     <p class="dim" style="font-size:.9em">Anything entered here is marked as recalled, counts for less in the arithmetic, and can be told apart from what you recorded at the time.</p>
     <div class="grid2">
-      <div><label for="bfLast">Most recent start you remember</label><input id="bfLast" type="date"></div>
-      <div><label for="bfLen">Usual length in days</label><input id="bfLen" type="number" min="15" max="90" value="28"></div>
-      <div><label for="bfDays">Usual bleeding days</label><input id="bfDays" type="number" min="1" max="14" value="5"></div>
-      <div><label for="bfCount">How many cycles back</label><input id="bfCount" type="number" min="1" max="24" value="6"></div>
+      <div><label for="bfLast">Last start you remember</label><input id="bfLast" type="date"></div>
+      <div><label for="bfLen">Usual length</label><input id="bfLen" type="number" min="15" max="90" value="28"></div>
+      <div><label for="bfDays">Bleeding days</label><input id="bfDays" type="number" min="1" max="14" value="5"></div>
+      <div><label for="bfCount">Cycles back</label><input id="bfCount" type="number" min="1" max="24" value="6"></div>
     </div>
     <div class="row" style="margin-top:12px"><button id="bfGo" type="button">Fill them in</button></div>
     <p id="bfState" class="dim" style="font-size:.85em" role="status" aria-live="polite"></p>
@@ -321,7 +327,7 @@ svg.chart{width:100%;height:auto;display:block;background:var(--panel2);border:1
       <div style="flex:0 0 auto"><button id="sigToday" type="button">Today</button></div>
     </div>
     <div class="grid2">
-      <div><label for="edTemp">Waking temperature</label><input id="edTemp" type="number" step="0.01" inputmode="decimal" placeholder="97.80"></div>
+      <div><label for="edTemp">Waking temp</label><input id="edTemp" type="number" step="0.01" inputmode="decimal" placeholder="97.80"></div>
       <div><label for="edMucus">Cervical mucus</label>
         <select id="edMucus">
           <option value="">not recorded</option><option value="0">dry</option><option value="1">sticky</option>
@@ -368,9 +374,9 @@ svg.chart{width:100%;height:auto;display:block;background:var(--panel2);border:1
     <p class="dim" style="font-size:.9em">A sheet to hand to a clinician, printed at true size so the cycle chart can be measured with a ruler. Paper cannot be reached from anywhere else, and nothing on it identifies you unless you put a name on it.</p>
     <div class="grid2">
       <div><label for="pgSize">Paper</label><select id="pgSize"><option value="letter">Letter</option><option value="a4">A4</option></select></div>
-      <div><label for="pgName">Name on the sheet</label><input id="pgName" type="text" placeholder="leave blank for none" spellcheck="false"></div>
-      <div><label for="pgNotes">Include day notes</label><select id="pgNotes"><option value="0">no</option><option value="1">yes</option></select></div>
-      <div><label for="pgBlank">Blank rows to carry on with</label><select id="pgBlank"><option value="0">none</option><option value="6" selected>six cycles</option><option value="12">twelve cycles</option></select></div>
+      <div><label for="pgName">Name on it</label><input id="pgName" type="text" placeholder="leave blank for none" spellcheck="false"></div>
+      <div><label for="pgNotes">Day notes</label><select id="pgNotes"><option value="0">no</option><option value="1">yes</option></select></div>
+      <div><label for="pgBlank">Blank rows</label><select id="pgBlank"><option value="0">none</option><option value="6" selected>six cycles</option><option value="12">twelve cycles</option></select></div>
     </div>
     <div class="row" style="margin-top:12px"><button id="btnPrint" type="button">Print the log</button></div>
   </div>
@@ -383,8 +389,8 @@ svg.chart{width:100%;height:auto;display:block;background:var(--panel2);border:1
     <div id="impMap" class="hide" style="margin-top:12px">
       <div class="rule"></div>
       <div class="grid2">
-        <div><label for="mapDate">Which column holds the date</label><select id="mapDate"></select></div>
-        <div><label for="mapFlow">Which column holds the flow or period</label><select id="mapFlow"></select></div>
+        <div><label for="mapDate">Date column</label><select id="mapDate"></select></div>
+        <div><label for="mapFlow">Flow column</label><select id="mapFlow"></select></div>
       </div>
       <div id="impPreview" class="mono" style="font-size:.82em;margin-top:.6em"></div>
       <div class="row" style="margin-top:10px"><button id="impGo" type="button">Bring these in</button><button id="impCancel" type="button">Cancel</button></div>
@@ -406,7 +412,7 @@ svg.chart{width:100%;height:auto;display:block;background:var(--panel2);border:1
     <div class="grid2">
       <div><label for="setTheme">Theme</label><select id="setTheme"><option value="auto">Follow this device</option><option value="day">Blush, light</option><option value="night">Ember, dark</option><option value="hc">High contrast</option></select></div>
       <div><label for="setIdle">Lock after idle</label><select id="setIdle"><option value="60">1 minute</option><option value="180">3 minutes</option><option value="600">10 minutes</option><option value="0">only when I say</option></select></div>
-      <div><label for="setBlur">Lock when the app leaves the screen</label><select id="setBlur"><option value="1">yes</option><option value="0">no</option></select></div>
+      <div><label for="setBlur">Lock when hidden</label><select id="setBlur"><option value="1">yes</option><option value="0">no</option></select></div>
       <div><label for="setDebug">Debug log</label><select id="setDebug"><option value="0">off</option><option value="1">on</option></select></div>
     </div>
     <div class="row" style="margin-top:12px"><button id="btnSelfTest" type="button">Run self test</button></div>
@@ -445,7 +451,7 @@ svg.chart{width:100%;height:auto;display:block;background:var(--panel2);border:1
       <h3>Keeping the other record believable</h3>
       <p class="dim" style="font-size:.9em">A record that has not been written to for months is a tell. With this on, the second record quietly gains ordinary looking entries whenever you open this one.</p>
       <div class="grid2">
-        <div><label for="setUpkeep">Keep the second record current</label><select id="setUpkeep"><option value="1">yes</option><option value="0">no</option></select></div>
+        <div><label for="setUpkeep">Keep it current</label><select id="setUpkeep"><option value="1">yes</option><option value="0">no</option></select></div>
       </div>
       <p id="upkeepState" class="dim mono" style="font-size:.82em"></p>
     </div>
@@ -454,7 +460,7 @@ svg.chart{width:100%;height:auto;display:block;background:var(--panel2);border:1
       <h3>Wipe passphrase</h3>
       <div class="grid2">
         <div><label for="wp1">Wipe passphrase</label><input id="wp1" type="password" autocomplete="new-password" spellcheck="false"></div>
-        <div><label for="wp2">Wipe passphrase again</label><input id="wp2" type="password" autocomplete="new-password" spellcheck="false"></div>
+        <div><label for="wp2">And again</label><input id="wp2" type="password" autocomplete="new-password" spellcheck="false"></div>
       </div>
       <div class="row" style="margin-top:10px"><button id="wpSet" type="button">Set the wipe passphrase</button><button id="wpClear" type="button">Remove it</button></div>
       <p id="wpState" class="dim" style="font-size:.85em" role="status" aria-live="polite"></p>
@@ -514,7 +520,7 @@ svg.chart{width:100%;height:auto;display:block;background:var(--panel2);border:1
 <script>
 "use strict";
 /* ==========================================================================
-   EPHEMERIS  FI-117  v1.7.0
+   EPHEMERIS  FI-117  v1.7.1
    Local first menstrual cycle record. Runs from disk. No network, ever.
    Storage holds two padded, independently keyed volumes and nothing else.
    Passphrase to key is Argon2id, written out below and checked against
@@ -829,7 +835,7 @@ function argon2id(pwd, salt, { t = 3, m = 65536, p = 1, dkLen = 32 } = {}) {
 
 
 /* ---------- constants and state ---------- */
-const VER = "1.7.0";
+const VER = "1.7.1";
 const MAGIC = "EPHEMERIS1";
 const STORE_KEY = "eph.v1";
 const PAD_BLOCK = 16384;

@@ -1,6 +1,6 @@
 # EPHEMERIS
 
-**Field Instrument FI-117 :: v1.7.0**
+**Field Instrument FI-117 :: v1.7.1**
 
 A private cycle record that runs from the file itself. No account, no server, no company, no network. One HTML file on your own device.
 
@@ -135,7 +135,7 @@ Neither Clue nor Flo records where a cycle started, so starts are derived here f
 
 Record station, **Run self test**. 60 checks covering the hand written cryptography against published test vectors, the sealing and padding, the wipe, date arithmetic across month ends and leap days, cycle detection, prediction behaviour at one cycle and at twelve, trend detection, the passphrase meter, the importers against Clue shaped, Flo shaped, tabular and Apple Health input, the paper log measurements, and a check that nothing readable ever reaches storage.
 
-A browser harness of 101 further checks covers setup, unlock under each passphrase, the attempt delay, the wipe, the untouched timer, and the second record being carried forward.
+A browser harness of 105 further checks covers setup, unlock under each passphrase, the attempt delay, the wipe, the untouched timer, and the second record being carried forward.
 
 ---
 

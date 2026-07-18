@@ -235,6 +235,21 @@ console.log('\n-- undoing a mark made by accident --');
   ok('the record survives all of that', w.__eph.S.data.days[today].f === 4);
 }
 
+console.log('\n-- form alignment --');
+{
+  const css = w.document.querySelector('style').textContent;
+  ok('controls are pinned to a common baseline in a row', /\.grid2>div>:last-child,\.row>div>:last-child\{margin-top:auto\}/.test(css.replace(/\s/g, '')));
+  ok('cells are laid out as columns so that can work', /\.grid2>div,\.row>div\{display:flex;flex-direction:column/.test(css.replace(/\s/g, '')));
+  const long = [...w.document.querySelectorAll('.grid2 label, .row label')]
+    .map(l => l.textContent.trim()).filter(t => t.length > 24);
+  ok('no label is long enough to wrap in a narrow cell: ' + (long[0] || 'none'), long.length === 0);
+  const cells = [...w.document.querySelectorAll('.grid2 > div')];
+  ok('every cell holds its label and its control in that order', cells.every(c => {
+    const l = c.querySelector('label'), last = c.lastElementChild;
+    return !l || (last && last !== l && /input|select|textarea|div/i.test(last.tagName));
+  }));
+}
+
 console.log('\n-- the look --');
 {
   w.localStorage.clear(); w.__ephMem = null; w.__eph.lock();
