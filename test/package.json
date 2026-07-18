@@ -1,0 +1,14 @@
+{
+  "name": "ephemeris-test",
+  "private": true,
+  "type": "module",
+  "description": "Development only. Nothing here ships in ephemeris.html.",
+  "scripts": {
+    "test": "node harness.mjs",
+    "verify-argon2": "node ../dev/verify-argon2.mjs"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0",
+    "hash-wasm": "^4.11.0"
+  }
+}

@@ -3,6 +3,22 @@
 Ephemeris, Field Instrument FI-117. Versions are marked in the file itself
 (`<!-- Ephemeris :: ephemeris.html :: vX.Y.Z -->`) and in the About station.
 
+## v1.6.2
+
+- The line under the wordmark reads "a record of your own" rather than "tables
+  from observation". The old one described the arithmetic. This one describes
+  what the person is being handed.
+
+## v1.6.1
+
+- The look control and the lock are icons now, sitting side by side in the
+  header. A crescent, a sun, a split circle, and a dotted ring for following the
+  device; a padlock for locking. Both keep spoken labels that name what they do
+  and, for the look, which one is showing.
+- Fixed the reason they were stacked rather than side by side: they had been
+  placed in a `.row`, which forces a 160 pixel basis on every child and made
+  them wrap in the header.
+
 ## v1.6.0
 
 A softer design language, and the looks made reachable.

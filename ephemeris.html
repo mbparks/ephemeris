@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Ephemeris :: ephemeris.html :: v1.6.0 -->
+<!-- Ephemeris :: ephemeris.html :: v1.6.2 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -93,6 +93,10 @@ nav.stations{display:flex;gap:4px;overflow-x:auto;max-width:940px;margin:0 auto;
 nav.stations button{flex:0 0 auto;min-height:40px;padding:.35em .95em;font-family:var(--data);font-size:.74rem;letter-spacing:.16em;text-transform:lowercase;background:transparent;border-color:transparent}
 nav.stations button:hover{border-color:var(--edge)}
 nav.stations button[aria-selected="true"]{background:var(--brass);color:var(--on-brass);font-weight:700}
+.tools{display:flex;flex:0 0 auto;gap:8px;align-items:center}
+.iconbtn{width:44px;height:44px;min-height:44px;padding:0;display:grid;place-items:center;border-radius:50%;background:transparent;color:var(--ink)}
+.iconbtn:hover{background:var(--panel);border-color:var(--brass)}
+.iconbtn svg{width:21px;height:21px;display:block}
 .lockbtn{min-height:40px;padding:.3em 1em;font-family:var(--data);font-size:.74rem;letter-spacing:.12em}
 .quickbar{max-width:940px;margin:0 auto;padding:0 var(--gap) 10px;display:flex;gap:6px;flex-wrap:wrap}
 .quickbar button{flex:1 1 120px;min-height:44px;font-size:.9rem}
@@ -154,7 +158,7 @@ svg.chart{width:100%;height:auto;display:block;background:var(--panel2);border:1
       <path d="M218 8 C180 2, 150 2, 120 7" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
       <path d="M110 2.6 C114 5, 114 9, 110 11.4 C106 9, 106 5, 110 2.6 Z" fill="currentColor"/>
     </svg>
-    <div class="sub">tables from observation</div>
+    <div class="sub">a record of your own</div>
 
     <div id="gateUnlock" class="hide">
       <label for="pp">Passphrase</label>
@@ -207,9 +211,15 @@ svg.chart{width:100%;height:auto;display:block;background:var(--panel2);border:1
 <header class="bar">
   <div class="inner">
     <span class="brandmark">Ephemeris</span>
-    <span class="row" style="flex:0 0 auto;gap:6px">
-      <button id="btnTheme" class="lockbtn" type="button" title="Change the look">Light</button>
-      <button id="btnLock" class="lockbtn" type="button" title="Close and lock (Esc)">Lock</button>
+    <span class="tools">
+      <button id="btnTheme" class="iconbtn" type="button" title="Change the look" aria-label="Change the look"></button>
+      <button id="btnLock" class="iconbtn" type="button" title="Close and lock (Esc)" aria-label="Close and lock">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M7 10V7.5a5 5 0 0 1 10 0V10" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          <rect x="4.5" y="10" width="15" height="10.5" rx="3.2" fill="none" stroke="currentColor" stroke-width="1.7"/>
+          <circle cx="12" cy="15.2" r="1.5" fill="currentColor"/>
+        </svg>
+      </button>
     </span>
   </div>
   <nav class="stations" role="tablist" aria-label="Stations">
@@ -504,7 +514,7 @@ svg.chart{width:100%;height:auto;display:block;background:var(--panel2);border:1
 <script>
 "use strict";
 /* ==========================================================================
-   EPHEMERIS  FI-117  v1.6.0
+   EPHEMERIS  FI-117  v1.6.2
    Local first menstrual cycle record. Runs from disk. No network, ever.
    Storage holds two padded, independently keyed volumes and nothing else.
    Passphrase to key is Argon2id, written out below and checked against
@@ -819,7 +829,7 @@ function argon2id(pwd, salt, { t = 3, m = 65536, p = 1, dkLen = 32 } = {}) {
 
 
 /* ---------- constants and state ---------- */
-const VER = "1.6.0";
+const VER = "1.6.2";
 const MAGIC = "EPHEMERIS1";
 const STORE_KEY = "eph.v1";
 const PAD_BLOCK = 16384;
@@ -2171,7 +2181,15 @@ async function safetyChanged() {
 }
 
 /* ---------- settings ---------- */
-const THEME_NAMES = { auto: "Follow", day: "Light", night: "Dark", hc: "Contrast" };
+const THEME_NAMES = { auto: "following this device", day: "light", night: "dark", hc: "high contrast" };
+/* Drawn rather than written, so the control stays one round button beside the
+   lock however long the name of a look happens to be. */
+const THEME_ICONS = {
+  auto: '<circle cx="12" cy="12" r="7.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2.2 2.6"/><circle cx="12" cy="12" r="2.6" fill="currentColor"/>',
+  day: '<circle cx="12" cy="12" r="4.4" fill="none" stroke="currentColor" stroke-width="1.7"/><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 2.6v2.4"/><path d="M12 19v2.4"/><path d="M2.6 12h2.4"/><path d="M19 12h2.4"/><path d="M5.4 5.4l1.7 1.7"/><path d="M16.9 16.9l1.7 1.7"/><path d="M18.6 5.4l-1.7 1.7"/><path d="M7.1 16.9l-1.7 1.7"/></g>',
+  night: '<path d="M20 14.4A8.6 8.6 0 0 1 9.6 4a8.6 8.6 0 1 0 10.4 10.4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>',
+  hc: '<circle cx="12" cy="12" r="7.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 4.4a7.6 7.6 0 0 1 0 15.2z" fill="currentColor"/>'
+};
 /* A stored theme of auto means follow the device, which is also what the gate
    uses, since a preference cannot be read before the record is open. */
 function resolveTheme(choice) {
@@ -2183,7 +2201,12 @@ function resolveTheme(choice) {
 function paintTheme(choice) {
   document.documentElement.setAttribute("data-theme", resolveTheme(choice));
   const b = $("btnTheme");
-  if (b) { b.textContent = THEME_NAMES[choice || "auto"]; b.setAttribute("aria-label", "Look: " + THEME_NAMES[choice || "auto"] + ". Press to change."); }
+  if (!b) return;
+  const key = choice || "auto";
+  b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + THEME_ICONS[key] + '</svg>';
+  const label = "Look: " + THEME_NAMES[key] + ". Press to change.";
+  b.setAttribute("aria-label", label);
+  b.setAttribute("title", label);
 }
 async function cycleTheme() {
   const order = ["auto", "day", "night", "hc"];

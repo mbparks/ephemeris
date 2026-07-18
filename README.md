@@ -1,6 +1,6 @@
 # EPHEMERIS
 
-**Field Instrument FI-117 :: v1.6.0**
+**Field Instrument FI-117 :: v1.6.2**
 
 A private cycle record that runs from the file itself. No account, no server, no company, no network. One HTML file on your own device.
 
@@ -133,7 +133,7 @@ Neither Clue nor Flo records where a cycle started, so starts are derived here f
 
 Record station, **Run self test**. 60 checks covering the hand written cryptography against published test vectors, the sealing and padding, the wipe, date arithmetic across month ends and leap days, cycle detection, prediction behaviour at one cycle and at twelve, trend detection, the passphrase meter, the importers against Clue shaped, Flo shaped, tabular and Apple Health input, the paper log measurements, and a check that nothing readable ever reaches storage.
 
-A browser harness of 85 further checks covers setup, unlock under each passphrase, the attempt delay, the wipe, the untouched timer, and the second record being carried forward.
+A browser harness of 90 further checks covers setup, unlock under each passphrase, the attempt delay, the wipe, the untouched timer, and the second record being carried forward.
 
 ---
 
@@ -158,7 +158,7 @@ all, and `dev/check.sh` fails the release if that ever stops being true.
 
 The wordmark is set in whatever soft script face the device already has, falling back through Palatino to a serif, since a single file that cannot reach the network cannot carry a font with it. Headings are italic serif, edges are rounded, calendar days are circles, and the icon is a crescent inside a ring of days, drawn in SVG in the file.
 
-Single file. Runs from `file://`. No build step, no dependencies, no third party code. BLAKE2b and Argon2id are written out in the file and checked against published vectors by the self test. Sealing uses the browser's own Web Crypto. Three looks, changed from a control in the header rather than buried in settings: **Blush**, light and warm; **Ember**, a warm dusk; and **High Contrast**. A new record follows whatever the device asks for, including a system request for more contrast, until you choose for yourself. Every text and control pairing in all three clears WCAG AA, and control edges are held to a 3 to 1 boundary against their surface. Your choice lives inside the sealed record, so the device learns nothing about you from it. Days are archived rather than destroyed.
+Single file. Runs from `file://`. No build step, no dependencies, no third party code. BLAKE2b and Argon2id are written out in the file and checked against published vectors by the self test. Sealing uses the browser's own Web Crypto. Three looks, changed from an icon in the header rather than buried in settings: **Blush**, light and warm; **Ember**, a warm dusk; and **High Contrast**. A new record follows whatever the device asks for, including a system request for more contrast, until you choose for yourself. Every text and control pairing in all three clears WCAG AA, and control edges are held to a 3 to 1 boundary against their surface. Your choice lives inside the sealed record, so the device learns nothing about you from it. Days are archived rather than destroyed.
 
 **No backwards compatibility with v1.0.** A v1.0 record cannot be opened here. Export a plain copy from v1.0 and bring it in.
 
