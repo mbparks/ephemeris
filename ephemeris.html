@@ -1,0 +1,2504 @@
+<!DOCTYPE html>
+<!-- Ephemeris :: ephemeris.html :: v1.6.0 -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<title>Ephemeris</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f4b8c0'/%3E%3Cstop offset='1' stop-color='%23f2cf9a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='13.5' fill='none' stroke='url(%23g)' stroke-width='1' opacity='.5'/%3E%3Cg fill='url(%23g)'%3E%3Ccircle cx='16' cy='2.5' r='1.15'/%3E%3Ccircle cx='25.5' cy='6.5' r='1.15'/%3E%3Ccircle cx='29.5' cy='16' r='1.15'/%3E%3Ccircle cx='25.5' cy='25.5' r='1.15'/%3E%3Ccircle cx='16' cy='29.5' r='1.15'/%3E%3Ccircle cx='6.5' cy='25.5' r='1.15'/%3E%3Ccircle cx='2.5' cy='16' r='1.15'/%3E%3Ccircle cx='6.5' cy='6.5' r='1.15'/%3E%3C/g%3E%3Cpath d='M19.6 5.6a10.8 10.8 0 1 0 0 20.8 8.9 8.9 0 1 1 0-20.8z' fill='url(%23g)'/%3E%3C/svg%3E">
+<style>
+/* Ephemeris. Palette: Ember (warm dusk, default), Blush (warm daylight),
+   High Contrast. Soft warm pastels for surfaces and marks, with the ink and
+   the accents carried deep enough that every pairing clears WCAG AA. Control
+   edges use --edge rather than the softer --rule so that inputs and buttons
+   keep a 3 to 1 boundary. No network assets of any kind. All type is a local
+   system stack. */
+:root{
+  --bg:#1e1820; --panel:#282029; --panel2:#231c25; --rule:#403543; --edge:#8a7a86;
+  --ink:#f4e9e2; --dim:#c0aeb4; --brass:#f0c890; --brass-dim:#a98a5e;
+  --mark:#e5a1ab; --mark-dim:#6b4a54; --on-mark:#1e1820; --on-mark-dim:#f4e9e2; --on-brass:#221a12;
+  --good:#a9dcbc; --warn:#f0cf9a;
+  --band:rgba(240,200,144,.17); --focus:#a8c8ff;
+  --display:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --script:"Snell Roundhand","Apple Chancery","Segoe Script","Gabriola","Edwardian Script ITC","Palatino Linotype",Palatino,Georgia,cursive;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --data:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --r:14px; --r-pill:999px; --gap:clamp(14px,2.4vw,24px);
+  --lift:0 1px 2px rgba(0,0,0,.10), 0 8px 24px rgba(0,0,0,.06);
+}
+html[data-theme="day"]{
+  --bg:#f8f1e9; --panel:#fffbf5; --panel2:#f2e8dd; --rule:#e2d2c2; --edge:#8f7b84;
+  --ink:#3d3037; --dim:#6b585f; --brass:#8a5a22; --brass-dim:#b08a4a;
+  --mark:#f0b3bb; --mark-dim:#f8dde1; --on-mark:#3d3037; --on-mark-dim:#3d3037; --on-brass:#fffbf5;
+  --good:#2f6b4d; --warn:#8a5c07;
+  --band:rgba(138,90,34,.14); --focus:#1c4fa1;
+}
+html[data-theme="hc"]{
+  --lift:none;
+  --bg:#000; --panel:#000; --panel2:#000; --rule:#fff; --edge:#fff;
+  --ink:#fff; --dim:#fff; --brass:#ffdf3a; --brass-dim:#ffdf3a;
+  --mark:#ff6b78; --mark-dim:#ff6b78; --on-mark:#000; --on-mark-dim:#000; --on-brass:#000;
+  --good:#5cff9c; --warn:#ffdf3a;
+  --band:rgba(255,223,58,.3); --focus:#fff;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink)}
+body{font-family:var(--body);font-size:clamp(15px,1.05rem,18px);line-height:1.5;-webkit-text-size-adjust:100%}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:var(--panel);border:1px solid var(--edge);border-radius:var(--r-pill);padding:.55em 1.15em;min-height:44px;cursor:pointer;transition:border-color .15s ease,background .15s ease}
+@media (prefers-reduced-motion: reduce){button{transition:none}}
+button:hover{border-color:var(--brass)}
+button[aria-pressed="true"],button.on{background:var(--brass);color:var(--on-brass);border-color:var(--brass);font-weight:600}
+button:disabled{opacity:.5;cursor:not-allowed}
+input,select,textarea{background:var(--panel2);border:1px solid var(--edge);border-radius:var(--r);padding:.6em .8em;min-height:44px;width:100%}
+textarea{min-height:5em;resize:vertical}
+label{display:block;font-size:.8em;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:0 0 .35em}
+h1,h2,h3{font-family:var(--display);font-weight:500;letter-spacing:.005em;margin:0 0 .45em}
+h2,h3{font-style:italic}
+h1{font-size:1.6rem}h2{font-size:1.25rem}h3{font-size:1.02rem}
+.mono{font-family:var(--data)}
+.dim{color:var(--dim)}
+.hide{display:none !important}
+.wrap{max-width:940px;margin:0 auto;padding:var(--gap)}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:var(--r);padding:var(--gap);margin:0 0 var(--gap);box-shadow:var(--lift)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.row>*{flex:1 1 160px}
+.grid2{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.eyebrow{font-family:var(--data);font-size:.7rem;letter-spacing:.24em;text-transform:uppercase;color:var(--brass)}
+.eyebrow::after{content:"";display:block;width:34px;height:1px;margin:.45em 0 .1em;background:linear-gradient(to right,var(--brass),transparent)}
+.rule{height:1px;background:linear-gradient(to right,transparent,var(--rule) 18%,var(--rule) 82%,transparent);margin:var(--gap) 0;border:0}
+
+#gate{min-height:100dvh;display:grid;place-items:center;padding:var(--gap)}
+#gate .plate{width:min(420px,100%);text-align:center}
+#gate h1{font-family:var(--script);font-weight:400;font-size:clamp(3rem,13vw,4.4rem);line-height:1.05;letter-spacing:.02em;color:var(--brass);margin:0 0 .05em;font-style:normal}
+#gate .flourish{display:block;margin:0 auto .9em;width:min(220px,70%);height:14px;color:var(--brass);opacity:.75}
+#gate .sub{font-family:var(--display);font-style:italic;font-size:1rem;letter-spacing:.02em;color:var(--dim);margin-bottom:2.2em}
+.gatemsg{min-height:1.6em;font-size:.9em;margin-top:.8em}
+.err{color:var(--mark)}
+.ok{color:var(--good)}
+.meter{height:7px;background:var(--panel2);border:1px solid var(--edge);border-radius:99px;overflow:hidden;margin:.45em 0 .2em}
+.meter i{display:block;height:100%;width:0;background:var(--mark);transition:width .2s linear}
+@media (prefers-reduced-motion: reduce){.meter i{transition:none}}
+.meter.s2 i{background:var(--warn)}.meter.s3 i{background:var(--brass)}.meter.s4 i{background:var(--good)}
+.meterlab{font-size:.8em;color:var(--dim);text-align:left;min-height:1.3em}
+
+header.bar{position:sticky;top:0;z-index:5;background:var(--panel2);border-bottom:1px solid var(--rule)}
+.bar .inner{max-width:940px;margin:0 auto;padding:8px var(--gap);display:flex;gap:10px;align-items:center;justify-content:space-between}
+.brandmark{font-family:var(--script);letter-spacing:.02em;color:var(--brass);font-size:1.5rem;line-height:1}
+nav.stations{display:flex;gap:4px;overflow-x:auto;max-width:940px;margin:0 auto;padding:0 var(--gap) 8px}
+nav.stations button{flex:0 0 auto;min-height:40px;padding:.35em .95em;font-family:var(--data);font-size:.74rem;letter-spacing:.16em;text-transform:lowercase;background:transparent;border-color:transparent}
+nav.stations button:hover{border-color:var(--edge)}
+nav.stations button[aria-selected="true"]{background:var(--brass);color:var(--on-brass);font-weight:700}
+.lockbtn{min-height:40px;padding:.3em 1em;font-family:var(--data);font-size:.74rem;letter-spacing:.12em}
+.quickbar{max-width:940px;margin:0 auto;padding:0 var(--gap) 10px;display:flex;gap:6px;flex-wrap:wrap}
+.quickbar button{flex:1 1 120px;min-height:44px;font-size:.9rem}
+
+.dialwrap{display:grid;place-items:center}
+svg.dial{width:100%;max-width:520px;height:auto;display:block}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82em;color:var(--dim);justify-content:center;margin-top:8px}
+.swatch{display:inline-block;width:12px;height:12px;border-radius:2px;vertical-align:-1px;margin-right:5px}
+
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;touch-action:pan-y}
+.cal .dow{font-family:var(--data);font-size:.7rem;letter-spacing:.1em;color:var(--dim);text-align:center;padding:4px 0}
+.day{aspect-ratio:1;min-height:40px;display:grid;place-items:center;border:1px solid var(--edge);border-radius:50%;background:var(--panel2);font-family:var(--data);font-size:.85rem;padding:0;position:relative}
+.day.blank{border:0;background:transparent;cursor:default}
+.day[data-flow="1"]{box-shadow:inset 0 -5px 0 var(--mark-dim)}
+.day[data-flow="2"]{background:var(--mark-dim);color:var(--on-mark-dim)}
+.day[data-flow="3"]{background:var(--mark);color:var(--on-mark)}
+.day[data-flow="4"]{background:var(--mark);color:var(--on-mark);font-weight:700;border-color:var(--ink);box-shadow:inset 0 0 0 2px var(--mark-dim)}
+.day.pred{border-style:dashed;border-color:var(--brass)}
+.day.sel{outline:3px solid var(--focus);outline-offset:1px}
+.day.recall{opacity:.72;border-style:dotted}
+.day .dot{position:absolute;top:3px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--brass)}
+
+table{width:100%;border-collapse:collapse;font-family:var(--data);font-size:.86rem}
+th,td{text-align:left;padding:.45em .5em;border-bottom:1px solid var(--rule)}
+th{color:var(--dim);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.72rem}
+svg.chart{width:100%;height:auto;display:block;background:var(--panel2);border:1px solid var(--edge);border-radius:var(--r)}
+.chip{display:inline-block;border:1px solid var(--edge);border-left:3px solid var(--brass);border-radius:var(--r-pill);padding:.4em .7em;margin:0 6px 6px 0;font-size:.88em;background:var(--panel2)}
+.chip.warnc{border-left-color:var(--warn)}
+.chip.okc{border-left-color:var(--good)}
+
+.seg{display:flex;gap:4px;flex-wrap:wrap}
+.seg button{flex:1 1 auto;min-width:56px}
+.notice{border-left:3px solid var(--warn);border-radius:0 var(--r) var(--r) 0;padding:.7em 1em;background:var(--panel2);font-size:.9em;margin:0 0 var(--gap)}
+.danger{border-left-color:var(--mark)}
+#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--panel);border:1px solid var(--brass);border-radius:var(--r-pill);box-shadow:var(--lift);padding:.6em 1em;z-index:20;max-width:90vw}
+#log{font-family:var(--data);font-size:.76rem;white-space:pre-wrap;max-height:240px;overflow:auto;background:var(--panel2);border:1px solid var(--edge);padding:.6em}
+.symrow{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.symrow input{flex:1 1 auto}
+.symrow button{flex:0 0 auto}
+@media (prefers-reduced-motion: no-preference){
+  #toast{animation:rise .18s ease-out}
+  @keyframes rise{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+}
+@media print{
+  body{background:#fff;color:#000}
+  header.bar,nav.stations,.quickbar,.noprint{display:none !important}
+  .card{border:1px solid #000;break-inside:avoid}
+  :root{--ink:#000;--dim:#333;--panel:#fff;--panel2:#fff;--rule:#000;--mark:#000;--mark-dim:#bbb;--brass:#000}
+}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="plate">
+    <h1>Ephemeris</h1>
+    <svg class="flourish" viewBox="0 0 220 14" aria-hidden="true" focusable="false">
+      <path d="M2 8 C40 2, 70 2, 100 7" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+      <path d="M218 8 C180 2, 150 2, 120 7" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+      <path d="M110 2.6 C114 5, 114 9, 110 11.4 C106 9, 106 5, 110 2.6 Z" fill="currentColor"/>
+    </svg>
+    <div class="sub">tables from observation</div>
+
+    <div id="gateUnlock" class="hide">
+      <label for="pp">Passphrase</label>
+      <input id="pp" type="password" autocomplete="current-password" spellcheck="false" enterkeyhint="go">
+      <div class="row" style="margin-top:10px"><button id="btnUnlock" type="button">Open</button></div>
+      <div id="unlockMsg" class="gatemsg" role="status" aria-live="polite"></div>
+      <div class="row" style="margin-top:1.4em">
+        <button id="btnRestore" type="button" class="lockbtn">Restore from a file</button>
+        <button id="btnFresh" type="button" class="lockbtn">Start a new record</button>
+      </div>
+      <div id="freshPanel" class="hide" style="margin-top:1em;text-align:left">
+        <div class="notice danger">Starting over clears what is on this device. If a passphrase for it still exists somewhere, it will no longer open anything here. There is no undo.</div>
+        <p class="dim" style="font-size:.9em">Save a sealed copy first if there is any chance you will remember a passphrase later. The copy stays sealed, so keeping it costs you nothing now and may be worth everything later.</p>
+        <div class="row">
+          <button id="btnFreshBackup" type="button">Save a sealed copy first</button>
+          <button id="btnFreshGo" type="button">Erase and start over</button>
+          <button id="btnFreshNo" type="button">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="gateSetup" class="hide" style="text-align:left">
+      <p class="dim" style="font-size:.92em">Nothing is stored anywhere but this device, and nothing on this device is readable without the passphrase. If you forget it, the record is gone. There is no recovery.</p>
+      <label for="pp1">Passphrase</label>
+      <input id="pp1" type="password" autocomplete="new-password" spellcheck="false">
+      <div class="meter" id="ppMeter" aria-hidden="true"><i></i></div>
+      <div class="meterlab" id="ppMeterLab" role="status" aria-live="polite"></div>
+      <label for="pp2" style="margin-top:.7em">Passphrase again</label>
+      <input id="pp2" type="password" autocomplete="new-password" spellcheck="false">
+      <div class="rule"></div>
+      <label for="ppd">Second passphrase (optional)</label>
+      <p class="dim" style="font-size:.85em;margin:.2em 0 .5em">Opens a separate, ordinary looking record. If you are ever made to unlock this, that is the one you can open. Both records exist on disk either way and neither reveals the other.</p>
+      <input id="ppd" type="password" autocomplete="new-password" spellcheck="false">
+      <div class="rule"></div>
+      <label for="setKdf">How hard to make guessing</label>
+      <select id="setKdf">
+        <option value="16">gentle, for an older phone</option>
+        <option value="64" selected>standard</option>
+        <option value="256">slow and strong</option>
+      </select>
+      <div class="row" style="margin-top:12px"><button id="btnCreate" type="button">Create the record</button></div>
+      <div id="setupMsg" class="gatemsg" role="status" aria-live="polite"></div>
+    </div>
+
+    <div id="gateBusy" class="gatemsg dim">Checking this device...</div>
+  </div>
+</div>
+
+<div id="app" class="hide">
+<header class="bar">
+  <div class="inner">
+    <span class="brandmark">Ephemeris</span>
+    <span class="row" style="flex:0 0 auto;gap:6px">
+      <button id="btnTheme" class="lockbtn" type="button" title="Change the look">Light</button>
+      <button id="btnLock" class="lockbtn" type="button" title="Close and lock (Esc)">Lock</button>
+    </span>
+  </div>
+  <nav class="stations" role="tablist" aria-label="Stations">
+    <button role="tab" id="tab-dial" aria-controls="st-dial" aria-selected="true" type="button">Dial</button>
+    <button role="tab" id="tab-log" aria-controls="st-log" aria-selected="false" type="button">Log</button>
+    <button role="tab" id="tab-signals" aria-controls="st-signals" aria-selected="false" type="button">Signals</button>
+    <button role="tab" id="tab-table" aria-controls="st-table" aria-selected="false" type="button">Table</button>
+    <button role="tab" id="tab-record" aria-controls="st-record" aria-selected="false" type="button">Record</button>
+    <button role="tab" id="tab-safety" aria-controls="st-safety" aria-selected="false" type="button">Safety</button>
+    <button role="tab" id="tab-about" aria-controls="st-about" aria-selected="false" type="button">About</button>
+  </nav>
+  <div class="quickbar">
+    <button id="qStart" type="button">Started today</button>
+    <button id="qToday" type="button">Bleeding today</button>
+    <button id="qEnd" type="button">It stopped</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section id="st-dial" role="tabpanel" aria-labelledby="tab-dial">
+  <div class="card">
+    <div class="eyebrow">Observed cycles</div>
+    <h2 id="dialHead">The dial</h2>
+    <div class="dialwrap"><div id="dialHost" aria-live="polite"></div></div>
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--mark)"></span>bleeding</span>
+      <span><span class="swatch" style="background:var(--mark-dim)"></span>light or spotting</span>
+      <span><span class="swatch" style="background:var(--band)"></span>next start, likely range</span>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Next start</h3>
+    <p id="predLine" class="mono"></p>
+    <div id="wherePlaced"></div>
+    <p id="predCaveat" class="dim" style="font-size:.9em"></p>
+  </div>
+</section>
+
+<section id="st-log" role="tabpanel" aria-labelledby="tab-log" class="hide">
+  <div class="card">
+    <div class="row" style="align-items:center">
+      <button id="calPrev" type="button" style="flex:0 0 auto">Previous</button>
+      <h2 id="calTitle" style="text-align:center;margin:0">Month</h2>
+      <button id="calNext" type="button" style="flex:0 0 auto">Next</button>
+    </div>
+    <div class="rule"></div>
+    <div class="cal" id="calGrid"></div>
+    <p class="dim" style="font-size:.85em;margin-top:.8em">Tap a day to open it. Hold and drag across days to mark a run at once. A dot means the day carries symptoms, readings, or a note. A dotted edge means the day was filled in from memory rather than recorded at the time.</p>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">Day sheet</div>
+    <h2 id="editTitle">Select a day</h2>
+    <label for="edFlow">Bleeding</label>
+    <div class="seg" id="edFlow" role="group" aria-label="Bleeding"></div>
+    <div class="rule"></div>
+    <div class="grid2" id="edSyms"></div>
+    <div class="rule"></div>
+    <div class="grid2">
+      <div><label for="edMeds">Medication taken</label><input id="edMeds" type="text" placeholder="ibuprofen 400" spellcheck="false"></div>
+      <div><label for="edTest">Test or result</label><input id="edTest" type="text" spellcheck="false"></div>
+    </div>
+    <div style="margin-top:12px"><label for="edNote">Note</label><textarea id="edNote"></textarea></div>
+    <div class="row" style="margin-top:12px">
+      <button id="edSave" type="button">Save the day</button>
+      <button id="edClear" type="button">Archive this day</button>
+    </div>
+    <p id="edState" class="dim" style="font-size:.85em" role="status" aria-live="polite"></p>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">From memory</div>
+    <h3>Fill in earlier cycles</h3>
+    <p class="dim" style="font-size:.9em">Anything entered here is marked as recalled, counts for less in the arithmetic, and can be told apart from what you recorded at the time.</p>
+    <div class="grid2">
+      <div><label for="bfLast">Most recent start you remember</label><input id="bfLast" type="date"></div>
+      <div><label for="bfLen">Usual length in days</label><input id="bfLen" type="number" min="15" max="90" value="28"></div>
+      <div><label for="bfDays">Usual bleeding days</label><input id="bfDays" type="number" min="1" max="14" value="5"></div>
+      <div><label for="bfCount">How many cycles back</label><input id="bfCount" type="number" min="1" max="24" value="6"></div>
+    </div>
+    <div class="row" style="margin-top:12px"><button id="bfGo" type="button">Fill them in</button></div>
+    <p id="bfState" class="dim" style="font-size:.85em" role="status" aria-live="polite"></p>
+  </div>
+</section>
+
+<section id="st-signals" role="tabpanel" aria-labelledby="tab-signals" class="hide">
+  <div class="notice">These are observation aids. They describe what already happened. They are not a contraceptive method and not a diagnosis.</div>
+  <div class="card">
+    <div class="eyebrow">Current cycle</div>
+    <h2>Waking temperature</h2>
+    <div id="bbtHost"></div>
+    <p id="bbtRead" class="mono" style="font-size:.9em"></p>
+  </div>
+  <div class="card">
+    <h3>Readings for <span id="sigDate" class="mono"></span></h3>
+    <div class="row" style="margin-bottom:12px">
+      <div><label for="sigDay">Day</label><input id="sigDay" type="date"></div>
+      <div style="flex:0 0 auto"><button id="sigToday" type="button">Today</button></div>
+    </div>
+    <div class="grid2">
+      <div><label for="edTemp">Waking temperature</label><input id="edTemp" type="number" step="0.01" inputmode="decimal" placeholder="97.80"></div>
+      <div><label for="edMucus">Cervical mucus</label>
+        <select id="edMucus">
+          <option value="">not recorded</option><option value="0">dry</option><option value="1">sticky</option>
+          <option value="2">creamy</option><option value="3">watery</option><option value="4">egg white</option>
+        </select>
+      </div>
+      <div><label for="edLh">LH test</label>
+        <select id="edLh"><option value="">not recorded</option><option value="0">negative</option><option value="1">positive</option></select>
+      </div>
+      <div><label for="edUnit">Temperature unit</label>
+        <select id="edUnit"><option value="F">Fahrenheit</option><option value="C">Celsius</option></select>
+      </div>
+    </div>
+    <div class="row" style="margin-top:12px"><button id="sigSave" type="button">Save the readings</button></div>
+    <p id="sigState" class="dim" style="font-size:.85em" role="status" aria-live="polite"></p>
+  </div>
+</section>
+
+<section id="st-table" role="tabpanel" aria-labelledby="tab-table" class="hide">
+  <div class="card">
+    <div class="eyebrow">Computed on opening, stored nowhere</div>
+    <h2>Cycle table</h2>
+    <div id="statHost"></div>
+  </div>
+  <div class="card">
+    <h3>What has been changing</h3>
+    <div id="trendHost"></div>
+  </div>
+  <div class="card">
+    <h3>Cycles</h3>
+    <div style="overflow-x:auto"><table id="cycTable"><thead><tr><th>Started</th><th>Length</th><th>Bleeding days</th><th>Peak flow</th><th>Source</th></tr></thead><tbody></tbody></table></div>
+  </div>
+</section>
+
+<section id="st-record" role="tabpanel" aria-labelledby="tab-record" class="hide">
+  <div class="card">
+    <div class="eyebrow">Backup and transfer</div>
+    <h2>Sealed copy</h2>
+    <p class="dim" style="font-size:.9em">A sealed copy holds both records and stays unreadable without the passphrase. This is the safe way to keep a backup or move to a new phone.</p>
+    <div class="row"><button id="expSealed" type="button">Save a sealed copy</button><button id="impSealed" type="button">Load a sealed copy</button></div>
+  </div>
+  <div class="card">
+    <h3>Paper log</h3>
+    <p class="dim" style="font-size:.9em">A sheet to hand to a clinician, printed at true size so the cycle chart can be measured with a ruler. Paper cannot be reached from anywhere else, and nothing on it identifies you unless you put a name on it.</p>
+    <div class="grid2">
+      <div><label for="pgSize">Paper</label><select id="pgSize"><option value="letter">Letter</option><option value="a4">A4</option></select></div>
+      <div><label for="pgName">Name on the sheet</label><input id="pgName" type="text" placeholder="leave blank for none" spellcheck="false"></div>
+      <div><label for="pgNotes">Include day notes</label><select id="pgNotes"><option value="0">no</option><option value="1">yes</option></select></div>
+      <div><label for="pgBlank">Blank rows to carry on with</label><select id="pgBlank"><option value="0">none</option><option value="6" selected>six cycles</option><option value="12">twelve cycles</option></select></div>
+    </div>
+    <div class="row" style="margin-top:12px"><button id="btnPrint" type="button">Print the log</button></div>
+  </div>
+  <div class="card">
+    <h3>Bring a record in</h3>
+    <p class="dim" style="font-size:.9em">Reads an export from another tracker or a plain copy from Ephemeris. It handles JSON (Clue and Flo both export JSON), a plain table, and an Apple Health export. Nothing is sent anywhere: the file is read here, on this device.</p>
+    <p class="dim" style="font-size:.85em">Clue sends a password protected zip. Unzip it first and pick the file inside. Neither Clue nor Flo records where your cycles started, so starts are worked out from the bleeding days themselves. Everything brought in is marked as recalled.</p>
+    <div class="row"><button id="impPlain" type="button">Choose a file</button></div>
+    <p id="impState" class="dim" style="font-size:.85em" role="status" aria-live="polite"></p>
+    <div id="impMap" class="hide" style="margin-top:12px">
+      <div class="rule"></div>
+      <div class="grid2">
+        <div><label for="mapDate">Which column holds the date</label><select id="mapDate"></select></div>
+        <div><label for="mapFlow">Which column holds the flow or period</label><select id="mapFlow"></select></div>
+      </div>
+      <div id="impPreview" class="mono" style="font-size:.82em;margin-top:.6em"></div>
+      <div class="row" style="margin-top:10px"><button id="impGo" type="button">Bring these in</button><button id="impCancel" type="button">Cancel</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="notice danger">A plain copy is readable by anything that touches it, including whatever backs up your downloads folder. Once it leaves this app it is out of reach.</div>
+    <h3>Plain copy</h3>
+    <div class="row"><button id="expPlain" type="button">Save a plain copy anyway</button></div>
+  </div>
+  <div class="card">
+    <h3>Symptoms tracked</h3>
+    <p class="dim" style="font-size:.9em">Change these to whatever you actually want to watch. Removing one keeps what you already recorded under it.</p>
+    <div id="symEdit"></div>
+    <div class="row" style="margin-top:10px"><button id="symAdd" type="button">Add a symptom</button><button id="symSave" type="button">Save the list</button></div>
+  </div>
+  <div class="card">
+    <h3>Settings</h3>
+    <div class="grid2">
+      <div><label for="setTheme">Theme</label><select id="setTheme"><option value="auto">Follow this device</option><option value="day">Blush, light</option><option value="night">Ember, dark</option><option value="hc">High contrast</option></select></div>
+      <div><label for="setIdle">Lock after idle</label><select id="setIdle"><option value="60">1 minute</option><option value="180">3 minutes</option><option value="600">10 minutes</option><option value="0">only when I say</option></select></div>
+      <div><label for="setBlur">Lock when the app leaves the screen</label><select id="setBlur"><option value="1">yes</option><option value="0">no</option></select></div>
+      <div><label for="setDebug">Debug log</label><select id="setDebug"><option value="0">off</option><option value="1">on</option></select></div>
+    </div>
+    <div class="row" style="margin-top:12px"><button id="btnSelfTest" type="button">Run self test</button></div>
+    <div id="testOut" class="mono" style="font-size:.85em;margin-top:.6em"></div>
+    <div id="logWrap" class="hide" style="margin-top:.8em"><div id="log"></div></div>
+  </div>
+  <div class="card">
+    <h3>Archived days</h3>
+    <div id="archHost"></div>
+  </div>
+  <div class="card">
+    <h3>Clear this device</h3>
+    <p class="dim" style="font-size:.9em">Removes everything Ephemeris holds here, both records, and returns to a blank setup screen. Useful when you are handing the device on, when you want to start again, or when you simply want it gone now.</p>
+    <div class="row"><button id="recClear" type="button">Clear this device</button></div>
+    <div id="recClearHost"></div>
+  </div>
+</section>
+
+<section id="st-safety" role="tabpanel" aria-labelledby="tab-safety" class="hide">
+  <div id="safeLocked">
+    <div class="card">
+      <div class="eyebrow">Read this first</div>
+      <h2>Measures that destroy things</h2>
+      <p>The settings behind this page can permanently erase this record. They exist for someone who expects a device to be taken, and they are dangerous to switch on casually.</p>
+      <ul>
+        <li>They cannot be undone. Erased means gone, with no recovery of any kind.</li>
+        <li>They do not defeat a forensic examination of the raw storage. They defeat a person holding your phone and demanding you open it.</li>
+        <li>Keep a sealed copy somewhere else before you turn any of this on.</li>
+      </ul>
+      <div class="row"><button id="safeAck" type="button">I understand. Show the settings.</button></div>
+    </div>
+  </div>
+  <div id="safeOpen" class="hide">
+    <div class="card">
+      <div class="eyebrow">Second record</div>
+      <h3>Keeping the other record believable</h3>
+      <p class="dim" style="font-size:.9em">A record that has not been written to for months is a tell. With this on, the second record quietly gains ordinary looking entries whenever you open this one.</p>
+      <div class="grid2">
+        <div><label for="setUpkeep">Keep the second record current</label><select id="setUpkeep"><option value="1">yes</option><option value="0">no</option></select></div>
+      </div>
+      <p id="upkeepState" class="dim mono" style="font-size:.82em"></p>
+    </div>
+    <div class="card">
+      <div class="notice danger">A wipe passphrase destroys this record the moment it is entered. It reports the same message as a wrong passphrase, so nothing on screen shows what happened. Enter your second passphrase afterwards to show an ordinary record.</div>
+      <h3>Wipe passphrase</h3>
+      <div class="grid2">
+        <div><label for="wp1">Wipe passphrase</label><input id="wp1" type="password" autocomplete="new-password" spellcheck="false"></div>
+        <div><label for="wp2">Wipe passphrase again</label><input id="wp2" type="password" autocomplete="new-password" spellcheck="false"></div>
+      </div>
+      <div class="row" style="margin-top:10px"><button id="wpSet" type="button">Set the wipe passphrase</button><button id="wpClear" type="button">Remove it</button></div>
+      <p id="wpState" class="dim" style="font-size:.85em" role="status" aria-live="polite"></p>
+    </div>
+    <div class="card">
+      <h3>Clear this device now</h3>
+      <p class="dim" style="font-size:.9em">The immediate version of everything else on this page. No passphrase, no timer, no waiting.</p>
+      <div class="row"><button id="safeClear" type="button">Clear this device</button></div>
+      <div id="safeClearHost"></div>
+    </div>
+    <div class="card">
+      <div class="notice danger">If this record is not opened within the chosen time, it erases itself the next time it is opened. It cannot erase anything while nobody opens it.</div>
+      <h3>Erase if untouched</h3>
+      <div class="grid2">
+        <div><label for="setDead">Erase after</label>
+          <select id="setDead"><option value="0">never</option><option value="30">30 days</option><option value="90">90 days</option><option value="180">180 days</option></select>
+        </div>
+      </div>
+      <p id="deadState" class="dim mono" style="font-size:.82em"></p>
+    </div>
+  </div>
+</section>
+
+<section id="st-about" role="tabpanel" aria-labelledby="tab-about" class="hide">
+  <div class="card">
+    <div class="eyebrow">Field Instrument FI-117</div>
+    <h2>Ephemeris <span class="mono dim" id="verOut"></span></h2>
+    <p>An ephemeris is a table of predicted positions worked out from earlier observation. Never certain, always improving with the record behind it.</p>
+    <h3>What this instrument does with your record</h3>
+    <ul>
+      <li>It runs from the file itself. There is no account, no server, and no company holding anything.</li>
+      <li>It cannot reach the network. The page forbids every outbound connection, so there is nothing to intercept and nothing to sell.</li>
+      <li>What sits on this device is ciphertext. Symptom names, dates, and notes never touch storage in readable form.</li>
+      <li>The passphrase is put through Argon2id, which is built to be expensive in memory as well as time, so guessing it with a rack of graphics cards is slow and costly.</li>
+      <li>Both records are padded to the same fixed size, so the file does not reveal how much is written in either one.</li>
+    </ul>
+    <h3>What it cannot do</h3>
+    <ul>
+      <li>It cannot protect you from a device that is already compromised. Anything watching the screen or the keyboard sees what you see.</li>
+      <li>A second passphrase answers a demand to unlock. It does not defeat a forensic examination of the raw storage.</li>
+      <li>Deleted data can survive in flash memory below the level any web page can reach.</li>
+      <li>Screenshots, backups you make yourself, and plain copies you export are outside its control.</li>
+      <li>Predictions are arithmetic on your own history. They are not medical advice, not a diagnosis, and not birth control.</li>
+    </ul>
+    <h3>Credits</h3>
+    <p class="dim" style="font-size:.9em">No third party libraries. BLAKE2b and Argon2id are written out in this file and checked against published test vectors by the self test. Sealing uses the browser's own Web Crypto (AES-256-GCM, HKDF-SHA256). Type is set in local system faces. The icon and the dial are drawn in SVG in this file.</p>
+    <h3>License</h3>
+    <p class="mono">GPL-3.0</p>
+    <h3>Feedback</h3>
+    <p class="dim" style="font-size:.9em">github.com/mbparks/ephemeris/issues. Please do not put anything from your record in a bug report.</p>
+  </div>
+</section>
+
+</main>
+</div>
+<div id="toast" class="hide" role="status" aria-live="polite"></div>
+<script>
+"use strict";
+/* ==========================================================================
+   EPHEMERIS  FI-117  v1.6.0
+   Local first menstrual cycle record. Runs from disk. No network, ever.
+   Storage holds two padded, independently keyed volumes and nothing else.
+   Passphrase to key is Argon2id, written out below and checked against
+   published test vectors by the self test.
+   ========================================================================== */
+
+/* ---------- BLAKE2b and Argon2id, no libraries ---------- */
+/* Pure JS BLAKE2b + Argon2id. Dev copy, validated against hash-wasm, then inlined. */
+
+const IV32 = new Uint32Array([
+  0xf3bcc908, 0x6a09e667, 0x84caa73b, 0xbb67ae85,
+  0xfe94f82b, 0x3c6ef372, 0x5f1d36f1, 0xa54ff53a,
+  0xade682d1, 0x510e527f, 0x2b3e6c1f, 0x9b05688c,
+  0xfb41bd6b, 0x1f83d9ab, 0x137e2179, 0x5be0cd19
+]);
+const SIGMA8 = [
+  0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
+  14,10,4,8,9,15,13,6,1,12,0,2,11,7,5,3,
+  11,8,12,0,5,2,15,13,10,14,3,6,7,1,9,4,
+  7,9,3,1,13,12,11,14,2,6,5,10,4,0,15,8,
+  9,0,5,7,2,4,10,15,14,1,11,12,6,8,3,13,
+  2,12,6,10,0,11,8,3,4,13,7,5,15,14,1,9,
+  12,5,1,15,14,13,4,10,0,7,6,3,9,2,8,11,
+  13,11,7,14,12,1,3,9,5,0,15,4,8,6,2,10,
+  6,15,14,9,11,3,0,8,12,2,13,7,1,4,10,5,
+  10,2,8,4,7,6,1,5,15,11,9,14,3,12,13,0,
+  0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
+  14,10,4,8,9,15,13,6,1,12,0,2,11,7,5,3
+];
+const SIGMA82 = new Uint8Array(SIGMA8.map(x => x * 2));
+
+const bv = new Uint32Array(32);
+const bm = new Uint32Array(32);
+
+function ADD64AA(v, a, b) { const o0 = v[a] + v[b]; let o1 = v[a + 1] + v[b + 1]; if (o0 >= 0x100000000) o1++; v[a] = o0; v[a + 1] = o1; }
+function ADD64AC(v, a, b0, b1) { let o0 = v[a] + b0; if (b0 < 0) o0 += 0x100000000; let o1 = v[a + 1] + b1; if (o0 >= 0x100000000) o1++; v[a] = o0; v[a + 1] = o1; }
+function GET32(arr, i) { return (arr[i] ^ (arr[i + 1] << 8) ^ (arr[i + 2] << 16) ^ (arr[i + 3] << 24)); }
+
+function G(a, b, c, d, ix, iy) {
+  const x0 = bm[ix], x1 = bm[ix + 1], y0 = bm[iy], y1 = bm[iy + 1];
+  ADD64AA(bv, a, b); ADD64AC(bv, a, x0, x1);
+  let xor0 = bv[d] ^ bv[a], xor1 = bv[d + 1] ^ bv[a + 1];
+  bv[d] = xor1; bv[d + 1] = xor0;
+  ADD64AA(bv, c, d);
+  xor0 = bv[b] ^ bv[c]; xor1 = bv[b + 1] ^ bv[c + 1];
+  bv[b] = (xor0 >>> 24) ^ (xor1 << 8); bv[b + 1] = (xor1 >>> 24) ^ (xor0 << 8);
+  ADD64AA(bv, a, b); ADD64AC(bv, a, y0, y1);
+  xor0 = bv[d] ^ bv[a]; xor1 = bv[d + 1] ^ bv[a + 1];
+  bv[d] = (xor0 >>> 16) ^ (xor1 << 16); bv[d + 1] = (xor1 >>> 16) ^ (xor0 << 16);
+  ADD64AA(bv, c, d);
+  xor0 = bv[b] ^ bv[c]; xor1 = bv[b + 1] ^ bv[c + 1];
+  bv[b] = (xor1 >>> 31) ^ (xor0 << 1); bv[b + 1] = (xor0 >>> 31) ^ (xor1 << 1);
+}
+
+function compress(ctx, last) {
+  let i = 0;
+  for (i = 0; i < 16; i++) { bv[i] = ctx.h[i]; bv[i + 16] = IV32[i]; }
+  bv[24] = bv[24] ^ ctx.t; bv[25] = bv[25] ^ (ctx.t / 0x100000000);
+  if (last) { bv[28] = ~bv[28]; bv[29] = ~bv[29]; }
+  for (i = 0; i < 32; i++) bm[i] = GET32(ctx.b, 4 * i);
+  for (i = 0; i < 12; i++) {
+    G(0, 8, 16, 24, SIGMA82[i * 16 + 0], SIGMA82[i * 16 + 1]);
+    G(2, 10, 18, 26, SIGMA82[i * 16 + 2], SIGMA82[i * 16 + 3]);
+    G(4, 12, 20, 28, SIGMA82[i * 16 + 4], SIGMA82[i * 16 + 5]);
+    G(6, 14, 22, 30, SIGMA82[i * 16 + 6], SIGMA82[i * 16 + 7]);
+    G(0, 10, 20, 30, SIGMA82[i * 16 + 8], SIGMA82[i * 16 + 9]);
+    G(2, 12, 22, 24, SIGMA82[i * 16 + 10], SIGMA82[i * 16 + 11]);
+    G(4, 14, 16, 26, SIGMA82[i * 16 + 12], SIGMA82[i * 16 + 13]);
+    G(6, 8, 18, 28, SIGMA82[i * 16 + 14], SIGMA82[i * 16 + 15]);
+  }
+  for (i = 0; i < 16; i++) ctx.h[i] = ctx.h[i] ^ bv[i] ^ bv[i + 16];
+}
+
+function b2bInit(outlen, key) {
+  const ctx = { b: new Uint8Array(128), h: new Uint32Array(16), t: 0, c: 0, outlen };
+  for (let i = 0; i < 16; i++) ctx.h[i] = IV32[i];
+  const keylen = key ? key.length : 0;
+  ctx.h[0] = ctx.h[0] ^ 0x01010000 ^ (keylen << 8) ^ outlen;
+  if (keylen) { b2bUpdate(ctx, key); ctx.c = 128; }
+  return ctx;
+}
+function b2bUpdate(ctx, input) {
+  for (let i = 0; i < input.length; i++) {
+    if (ctx.c === 128) { ctx.t += ctx.c; compress(ctx, false); ctx.c = 0; }
+    ctx.b[ctx.c++] = input[i];
+  }
+}
+function b2bFinal(ctx) {
+  ctx.t += ctx.c;
+  while (ctx.c < 128) ctx.b[ctx.c++] = 0;
+  compress(ctx, true);
+  const out = new Uint8Array(ctx.outlen);
+  for (let i = 0; i < ctx.outlen; i++) out[i] = ctx.h[i >> 2] >> (8 * (i & 3));
+  return out;
+}
+function blake2b(input, outlen = 64, key) {
+  const ctx = b2bInit(outlen, key);
+  b2bUpdate(ctx, input);
+  return b2bFinal(ctx);
+}
+
+/* Argon2 variable length hash H' */
+function le32(n) { const b = new Uint8Array(4); b[0] = n & 255; b[1] = (n >>> 8) & 255; b[2] = (n >>> 16) & 255; b[3] = (n >>> 24) & 255; return b; }
+function cat(...parts) {
+  let n = 0; parts.forEach(p => n += p.length);
+  const o = new Uint8Array(n); let i = 0;
+  parts.forEach(p => { o.set(p, i); i += p.length; });
+  return o;
+}
+function hPrime(outlen, input) {
+  const pre = cat(le32(outlen), input);
+  if (outlen <= 64) return blake2b(pre, outlen);
+  const r = Math.ceil(outlen / 32) - 2;
+  const out = new Uint8Array(outlen);
+  let v = blake2b(pre, 64);
+  out.set(v.subarray(0, 32), 0);
+  for (let i = 1; i < r; i++) {
+    v = blake2b(v, 64);
+    out.set(v.subarray(0, 32), i * 32);
+  }
+  const last = blake2b(v, outlen - 32 * r);
+  out.set(last, r * 32);
+  return out;
+}
+
+/* 64 bit helpers over a Uint32Array block of 256 words (1024 bytes, 128 u64) */
+function blkXor(dst, a, b) { for (let i = 0; i < 256; i++) dst[i] = a[i] ^ b[i]; }
+
+/* the Argon2 permutation P over 16 u64 held as 32 u32 words in tmp */
+const P = new Uint32Array(32);
+function fBlaMka(a, b) {
+  /* a + b + 2 * lo(a) * lo(b), all mod 2^64 */
+  const a0 = P[a], a1 = P[a + 1], b0 = P[b], b1 = P[b + 1];
+  const xl = a0 & 0xffff, xh = a0 >>> 16;
+  const yl = b0 & 0xffff, yh = b0 >>> 16;
+  /* 2 * (a0 * b0) as 64 bit */
+  let m0 = xl * yl;
+  let m1 = xh * yl + ((m0 >>> 16) & 0xffff);
+  let m2 = xl * yh + (m1 & 0xffff);
+  let hi = xh * yh + (m1 >>> 16) + (m2 >>> 16);
+  let lo = ((m2 & 0xffff) << 16) | (m0 & 0xffff);
+  /* times two */
+  hi = ((hi << 1) | (lo >>> 31)) >>> 0;
+  lo = (lo << 1) >>> 0;
+  /* sum = a + b + that */
+  let s0 = (a0 >>> 0) + (b0 >>> 0);
+  let carry = s0 >= 0x100000000 ? 1 : 0;
+  s0 = s0 >>> 0;
+  let s1 = ((a1 >>> 0) + (b1 >>> 0) + carry) >>> 0;
+  let t0 = s0 + lo;
+  carry = t0 >= 0x100000000 ? 1 : 0;
+  t0 = t0 >>> 0;
+  const t1 = (s1 + hi + carry) >>> 0;
+  P[a] = t0; P[a + 1] = t1;
+}
+function rot(a, n) {
+  /* rotate right the u64 at word index a by n bits, n in {32,24,16,63} */
+  const lo = P[a], hi = P[a + 1];
+  let nl, nh;
+  if (n === 32) { nl = hi; nh = lo; }
+  else if (n === 63) { nl = ((hi >>> 31) | (lo << 1)) >>> 0; nh = ((lo >>> 31) | (hi << 1)) >>> 0; }
+  else { nl = ((lo >>> n) | (hi << (32 - n))) >>> 0; nh = ((hi >>> n) | (lo << (32 - n))) >>> 0; }
+  P[a] = nl; P[a + 1] = nh;
+}
+function xorTo(a, b) { P[a] = P[a] ^ P[b]; P[a + 1] = P[a + 1] ^ P[b + 1]; }
+function GB(a, b, c, d) {
+  fBlaMka(a, b); xorTo(d, a); rot(d, 32);
+  fBlaMka(c, d); xorTo(b, c); rot(b, 24);
+  fBlaMka(a, b); xorTo(d, a); rot(d, 16);
+  fBlaMka(c, d); xorTo(b, c); rot(b, 63);
+}
+function permute() {
+  GB(0, 8, 16, 24); GB(2, 10, 18, 26); GB(4, 12, 20, 28); GB(6, 14, 22, 30);
+  GB(0, 10, 20, 30); GB(2, 12, 22, 24); GB(4, 14, 16, 26); GB(6, 8, 18, 28);
+}
+/* compression G(X, Y): R = X xor Y, Q = P applied rowwise, Z = P applied columnwise, out = Z xor R */
+const R = new Uint32Array(256);
+const Z = new Uint32Array(256);
+function compressG(out, X, Y, withXor) {
+  blkXor(R, X, Y);
+  Z.set(R);
+  let i, j;
+  for (i = 0; i < 8; i++) {
+    for (j = 0; j < 32; j++) P[j] = Z[i * 32 + j];
+    permute();
+    for (j = 0; j < 32; j++) Z[i * 32 + j] = P[j];
+  }
+  for (i = 0; i < 8; i++) {
+    /* column i takes u64 lanes i*2 and i*2+1 of each of the 8 rows */
+    for (j = 0; j < 8; j++) {
+      P[j * 4] = Z[j * 32 + i * 4];
+      P[j * 4 + 1] = Z[j * 32 + i * 4 + 1];
+      P[j * 4 + 2] = Z[j * 32 + i * 4 + 2];
+      P[j * 4 + 3] = Z[j * 32 + i * 4 + 3];
+    }
+    permute();
+    for (j = 0; j < 8; j++) {
+      Z[j * 32 + i * 4] = P[j * 4];
+      Z[j * 32 + i * 4 + 1] = P[j * 4 + 1];
+      Z[j * 32 + i * 4 + 2] = P[j * 4 + 2];
+      Z[j * 32 + i * 4 + 3] = P[j * 4 + 3];
+    }
+  }
+  if (withXor) { for (i = 0; i < 256; i++) out[i] = out[i] ^ Z[i] ^ R[i]; }
+  else { for (i = 0; i < 256; i++) out[i] = Z[i] ^ R[i]; }
+}
+
+/* exact 32 bit fixed point helpers. Doubles lose bits above 2^53, so the two
+   places Argon2 needs a 64 bit product are done in halves. */
+function sq32(j) {              /* floor(j*j / 2^32) for a 32 bit j */
+  const h = j >>> 16, l = j & 0xffff;
+  const mid = 2 * h * l;        /* below 2^33, exact */
+  const term = mid * 65536 + l * l;
+  return h * h + Math.floor(term / 4294967296);
+}
+function mulShift32(n, x) {     /* floor(n*x / 2^32), n and x below 2^32 */
+  const xh = Math.floor(x / 65536), xl = x % 65536;
+  const A = n * xh, B = n * xl;
+  const q1 = Math.floor(A / 65536), r1 = A - q1 * 65536;
+  return q1 + Math.floor((r1 * 65536 + B) / 4294967296);
+}
+
+/* Argon2id. type 2. version 0x13. */
+function argon2id(pwd, salt, { t = 3, m = 65536, p = 1, dkLen = 32 } = {}) {
+  const type = 2, ver = 0x13;
+  const H0 = blake2b(cat(
+    le32(p), le32(dkLen), le32(m), le32(t), le32(ver), le32(type),
+    le32(pwd.length), pwd, le32(salt.length), salt, le32(0), le32(0)), 64);
+
+  const lanes = p;
+  const mPrime = Math.floor(m / (4 * lanes)) * 4 * lanes;
+  const q = mPrime / lanes;            /* blocks per lane */
+  const segLen = q / 4;
+  const mem = new Uint32Array(mPrime * 256);
+  const blk = (i) => mem.subarray(i * 256, i * 256 + 256);
+  const u8 = new Uint8Array(mem.buffer);
+
+  for (let i = 0; i < lanes; i++) {
+    u8.set(hPrime(1024, cat(H0, le32(0), le32(i))), (i * q) * 1024);
+    u8.set(hPrime(1024, cat(H0, le32(1), le32(i))), (i * q + 1) * 1024);
+  }
+
+  const addr = new Uint32Array(256);
+  const zeroBlk = new Uint32Array(256);
+  const inputBlk = new Uint32Array(256);
+
+  for (let pass = 0; pass < t; pass++) {
+    for (let slice = 0; slice < 4; slice++) {
+      const dataIndependent = (pass === 0 && slice < 2);
+      for (let lane = 0; lane < lanes; lane++) {
+        if (dataIndependent) {
+          inputBlk.fill(0);
+          inputBlk[0] = pass; inputBlk[1] = 0;
+          inputBlk[2] = lane; inputBlk[3] = 0;
+          inputBlk[4] = slice; inputBlk[5] = 0;
+          inputBlk[6] = mPrime; inputBlk[7] = 0;
+          inputBlk[8] = t; inputBlk[9] = 0;
+          inputBlk[10] = type; inputBlk[11] = 0;
+          inputBlk[12] = 0; inputBlk[13] = 0;
+        }
+        const nextAddresses = () => {
+          inputBlk[12] = (inputBlk[12] + 1) >>> 0;
+          compressG(addr, zeroBlk, inputBlk, false);
+          compressG(addr, zeroBlk, addr, false);
+        };
+        const startIdx = (pass === 0 && slice === 0) ? 2 : 0;
+        if (dataIndependent && startIdx === 2) nextAddresses();
+        for (let idx = startIdx; idx < segLen; idx++) {
+          const cur = lane * q + slice * segLen + idx;
+          const prev = (cur % q === 0) ? (cur + q - 1) : (cur - 1);
+
+          let J1, J2;
+          if (dataIndependent) {
+            if (idx % 128 === 0) nextAddresses();
+            J1 = addr[(idx % 128) * 2] >>> 0;
+            J2 = addr[(idx % 128) * 2 + 1] >>> 0;
+          } else {
+            const pb = blk(prev);
+            J1 = pb[0] >>> 0; J2 = pb[1] >>> 0;
+          }
+
+          const refLane = (pass === 0 && slice === 0) ? lane : (J2 % lanes);
+          let refAreaSize;
+          if (pass === 0) {
+            if (refLane === lane) refAreaSize = slice * segLen + idx - 1;
+            else refAreaSize = slice * segLen - (idx === 0 ? 1 : 0);
+          } else {
+            if (refLane === lane) refAreaSize = q - segLen + idx - 1;
+            else refAreaSize = q - segLen - (idx === 0 ? 1 : 0);
+          }
+          if (refAreaSize < 1) refAreaSize = 1;
+          const rel = refAreaSize - 1 - mulShift32(refAreaSize, sq32(J1));
+          let startPos = 0;
+          if (pass !== 0) startPos = (slice === 3) ? 0 : (slice + 1) * segLen;
+          const refIndex = (startPos + rel) % q;
+          const refBlock = blk(refLane * q + refIndex);
+
+          compressG(blk(cur), blk(prev), refBlock, pass !== 0);
+        }
+      }
+    }
+  }
+
+  const final = new Uint32Array(256);
+  final.set(blk((lanes - 1) * q + q - 1));
+  for (let i = 0; i < lanes - 1; i++) {
+    const b = blk(i * q + q - 1);
+    for (let j = 0; j < 256; j++) final[j] = final[j] ^ b[j];
+  }
+  return hPrime(dkLen, new Uint8Array(final.buffer.slice(final.byteOffset, final.byteOffset + 1024)));
+}
+
+
+/* ---------- constants and state ---------- */
+const VER = "1.6.0";
+const MAGIC = "EPHEMERIS1";
+const STORE_KEY = "eph.v1";
+const PAD_BLOCK = 16384;
+const PAD_MIN = 65536;
+const KDF_T = 2, KDF_P = 1;
+const ENC_INFO = "eph-enc-v2", VFY_INFO = "eph-vfy-v2", WIPE_INFO = "eph-wipe-v2";
+
+const S = {
+  key: null, slot: null, data: null, salt: null, target: PAD_MIN,
+  file: null, memoryOnly: false, debug: false,
+  selDate: null, calMonth: null, idleTimer: null, painting: null, paintVal: 0
+};
+
+const $ = (id) => document.getElementById(id);
+const el = (t, a, kids) => { const n = document.createElement(t); if (a) for (const k in a) { if (k === "text") n.textContent = a[k]; else n.setAttribute(k, a[k]); } if (kids) kids.forEach(c => n.appendChild(c)); return n; };
+function dbg(...m) { if (!S.debug) return; const L = $("log"); if (!L) return; L.textContent += m.join(" ") + "\n"; L.scrollTop = L.scrollHeight; }
+let toastT = null;
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.remove("hide"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.add("hide"), 2600); }
+const te = (s) => new TextEncoder().encode(s);
+
+const b64 = {
+  enc(buf) { const b = new Uint8Array(buf); let s = ""; for (let i = 0; i < b.length; i += 8192) s += String.fromCharCode.apply(null, b.subarray(i, i + 8192)); return btoa(s); },
+  dec(str) { const s = atob(str); const b = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) b[i] = s.charCodeAt(i); return b; }
+};
+
+const D = {
+  iso(d) { return d.toISOString().slice(0, 10); },
+  parse(iso) { const p = iso.split("-").map(Number); return new Date(Date.UTC(p[0], p[1] - 1, p[2], 12, 0, 0)); },
+  today() { const n = new Date(); return D.iso(new Date(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate(), 12))); },
+  add(iso, n) { const d = D.parse(iso); d.setUTCDate(d.getUTCDate() + n); return D.iso(d); },
+  diff(a, b) { return Math.round((D.parse(b) - D.parse(a)) / 86400000); },
+  human(iso) { const d = D.parse(iso); return d.toLocaleDateString(undefined, { timeZone: "UTC", year: "numeric", month: "short", day: "numeric" }); }
+};
+
+/* ---------- key material ----------
+   One Argon2id derivation per unlock. Both volumes share the file salt, so a
+   single derived key can be checked against each volume's verifier instead of
+   paying for the memory hard function twice. */
+async function deriveAll(pass, salt, kdf) {
+  const raw = argon2id(te(pass), salt, { t: kdf.t, m: kdf.m, p: kdf.p, dkLen: 32 });
+  const km = await crypto.subtle.importKey("raw", raw, "HKDF", false, ["deriveKey", "deriveBits"]);
+  const mk = (info, usage) => crypto.subtle.deriveKey(
+    { name: "HKDF", hash: "SHA-256", salt: new Uint8Array(0), info: te(info) },
+    km, { name: "AES-GCM", length: 256 }, true, usage);
+  const enc = await mk(ENC_INFO, ["encrypt", "decrypt"]);
+  const wipe = await mk(WIPE_INFO, ["encrypt", "decrypt"]);
+  const vfyBits = await crypto.subtle.deriveBits(
+    { name: "HKDF", hash: "SHA-256", salt: new Uint8Array(0), info: te(VFY_INFO) }, km, 128);
+  raw.fill(0);
+  return { enc, wipe, vfy: b64.enc(vfyBits) };
+}
+function sameVfy(a, b) {
+  if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) return false;
+  let d = 0; for (let i = 0; i < a.length; i++) d |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return d === 0;
+}
+function padTarget(len) { let t = PAD_MIN; while (t < len) t += PAD_BLOCK; return t; }
+async function sealWith(key, obj, target) {
+  const bytes = te(JSON.stringify(obj));
+  if (bytes.length > target) throw new Error("volume larger than its padded size");
+  const buf = new Uint8Array(target); buf.set(bytes);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, buf);
+  return { i: b64.enc(iv), c: b64.enc(ct) };
+}
+async function openWith(key, vol) {
+  const buf = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64.dec(vol.i) }, key, b64.dec(vol.c));
+  let txt = new TextDecoder().decode(buf);
+  const z = txt.indexOf("\u0000"); if (z >= 0) txt = txt.slice(0, z);
+  const obj = JSON.parse(txt);
+  if (obj.magic !== MAGIC) throw new Error("not an Ephemeris volume");
+  return obj;
+}
+async function rawKeyOf(k) { return b64.enc(await crypto.subtle.exportKey("raw", k)); }
+async function keyFromRaw(s) { return crypto.subtle.importKey("raw", b64.dec(s), { name: "AES-GCM" }, true, ["encrypt", "decrypt"]); }
+
+/* ---------- storage ---------- */
+function rawRead() {
+  try { const s = localStorage.getItem(STORE_KEY); return s ? JSON.parse(s) : (window.__ephMem || null); }
+  catch (e) { dbg("storage read blocked", e.message); S.memoryOnly = true; return window.__ephMem || null; }
+}
+function rawWrite(obj) {
+  window.__ephMem = obj;
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(obj)); return true; }
+  catch (e) { S.memoryOnly = true; dbg("storage write blocked", e.message); return false; }
+}
+const DEFAULT_SYMS = [["pain", "Cramping or pain"], ["mood", "Mood"], ["sleep", "Sleep disturbed"], ["head", "Headache"], ["gi", "Gut"]];
+function blankRecord(role) {
+  return {
+    magic: MAGIC, v: 2, role: role || "real", days: {},
+    syms: DEFAULT_SYMS.map(([k, name]) => ({ k, name })),
+    prefs: { unit: "F", theme: "auto", idle: 180, lockOnBlur: 1 },
+    safety: { upkeep: 1, deadDays: 0, lastOpen: D.today(), acked: 0 },
+    made: D.today()
+  };
+}
+async function persist() {
+  if (!S.key) return;
+  const rec = Object.assign({}, S.data, { magic: MAGIC });
+  const need = te(JSON.stringify(rec)).length;
+  if (need > S.target) { S.target = padTarget(need); dbg("padded size grew to", S.target); }
+  const sealed = await sealWith(S.key, rec, S.target);
+  const f = S.file;
+  f.p = S.target;
+  f.vols[S.slot] = { vfy: f.vols[S.slot].vfy, i: sealed.i, c: sealed.c };
+  rawWrite(f);
+  dbg("persisted slot", S.slot, "padded", S.target);
+}
+
+/* ---------- decoy ---------- */
+function seedDecoy(fromIso, toIso, into) {
+  const r = into || blankRecord("decoy");
+  const rnd = (n) => Math.floor(Math.random() * n);
+  let cur = fromIso;
+  while (D.diff(cur, toIso) > 6) {
+    const plen = 4 + rnd(2);
+    for (let i = 0; i < plen; i++) {
+      const day = D.add(cur, i);
+      if (D.diff(day, toIso) < 0) break;
+      r.days[day] = { f: i === 0 ? 3 : i === plen - 1 ? 1 : 3 + (rnd(2) ? 1 : 0), s: { pain: rnd(3), mood: rnd(3) }, n: "" };
+    }
+    if (rnd(3) === 0) { const d = D.add(cur, 12 + rnd(6)); if (D.diff(d, toIso) > 0) r.days[d] = { f: 0, s: { pain: 1, head: rnd(2) }, n: "" }; }
+    cur = D.add(cur, 27 + rnd(5));
+  }
+  r.lastSeed = cur;
+  return r;
+}
+/* Keep the second record from going stale. The real record carries the second
+   record's key so it can do this without anyone entering that passphrase. A
+   record that has not been written to in months is itself a tell. */
+async function upkeepDecoy() {
+  try {
+    const dk = S.data.decoy;
+    if (!dk || !dk.key || !S.data.safety || !S.data.safety.upkeep) return;
+    if (dk.last && D.diff(dk.last, D.today()) < 3) return;
+    const key = await keyFromRaw(dk.key);
+    const vol = S.file.vols[dk.idx];
+    const rec = await openWith(key, vol);
+    const from = rec.lastSeed || D.add(D.today(), -60);
+    if (D.diff(from, D.today()) > 6) seedDecoy(from, D.today(), rec);
+    const sealed = await sealWith(key, rec, S.target);
+    S.file.vols[dk.idx] = { vfy: vol.vfy, i: sealed.i, c: sealed.c };
+    dk.last = D.today();
+    await persist();
+    dbg("decoy carried forward to", D.today());
+  } catch (e) { dbg("decoy upkeep skipped", e.message); }
+}
+
+/* ---------- passphrase strength, hand rolled ---------- */
+const WEAK = ["password", "123456", "qwerty", "letmein", "iloveyou", "admin", "welcome", "monkey", "dragon", "abc123", "period", "ephemeris"];
+function strength(p) {
+  if (!p) return { score: 0, bits: 0, say: "" };
+  const lower = p.toLowerCase();
+  if (WEAK.some(w => lower.includes(w))) return { score: 0, bits: 0, say: "This contains a word that is in every guessing list. Change it." };
+  let pool = 0;
+  if (/[a-z]/.test(p)) pool += 26;
+  if (/[A-Z]/.test(p)) pool += 26;
+  if (/[0-9]/.test(p)) pool += 10;
+  if (/[^a-zA-Z0-9]/.test(p)) pool += 32;
+  const words = p.trim().split(/\s+/).filter(w => w.length > 1);
+  let bits = p.length * Math.log2(pool || 1);
+  if (words.length >= 3) bits = Math.max(bits, words.length * 11);
+  const uniq = new Set(p).size;
+  if (uniq <= 3) bits = Math.min(bits, 20);
+  if (/^(.)\1+$/.test(p)) bits = 8;
+  let score = 1, say = "";
+  if (bits >= 90) { score = 4; say = "Strong. This would take a very long time to guess."; }
+  else if (bits >= 65) { score = 3; say = "Good. Four or more unrelated words would be better still."; }
+  else if (bits >= 45) { score = 2; say = "Workable, but it would fall to a determined attempt. Try a few unrelated words."; }
+  else { score = 1; say = "Weak. This one would fall in an afternoon. Four unrelated words beats any clever short one."; }
+  return { score, bits: Math.round(bits), say };
+}
+
+/* ---------- gate ---------- */
+function kdfOf(mKiB) { return { m: (mKiB || 64) * 1024, t: KDF_T, p: KDF_P }; }
+async function boot() {
+  $("verOut").textContent = "v" + VER;
+  paintTheme("auto");
+  const f = rawRead();
+  $("gateBusy").classList.add("hide");
+  if (f && f.f === "eph" && f.v === 2 && f.vols) { $("gateUnlock").classList.remove("hide"); $("pp").focus(); }
+  else if (f && f.v === 1) {
+    $("gateUnlock").classList.remove("hide");
+    $("unlockMsg").className = "gatemsg err";
+    $("unlockMsg").textContent = "This device holds a record from an earlier version, which this one cannot open. Save a plain copy from that version, then start a new record here and bring the copy in.";
+  }
+  else { $("gateSetup").classList.remove("hide"); $("pp1").focus(); }
+}
+
+async function createRecord() {
+  const p1 = $("pp1").value, p2 = $("pp2").value, pd = $("ppd").value;
+  const msg = $("setupMsg");
+  msg.className = "gatemsg err";
+  if (p1.length < 8) { msg.textContent = "Use at least 8 characters. Longer is better than complicated."; return; }
+  if (p1 !== p2) { msg.textContent = "The two entries do not match."; return; }
+  if (pd && pd === p1) { msg.textContent = "The second passphrase has to differ from the first."; return; }
+  if (strength(p1).score === 0) { msg.textContent = strength(p1).say; return; }
+  $("btnCreate").disabled = true;
+  msg.className = "gatemsg dim"; msg.textContent = "Sealing the record. This takes a moment on purpose.";
+  await new Promise(r => setTimeout(r, 40));
+
+  const kdf = kdfOf(Number($("setKdf").value));
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const K = await deriveAll(p1, salt, kdf);
+  const decoyPass = pd || b64.enc(crypto.getRandomValues(new Uint8Array(32)));
+  const Kd = await deriveAll(decoyPass, salt, kdf);
+
+  const realIdx = crypto.getRandomValues(new Uint8Array(1))[0] & 1;   /* no fixed convention on disk */
+  const decoyIdx = 1 - realIdx;
+  const recReal = blankRecord("real");
+  const recDecoy = seedDecoy(D.add(D.today(), -300), D.today());
+  recReal.decoy = { idx: decoyIdx, key: await rawKeyOf(Kd.enc), last: D.today() };
+  const target = padTarget(Math.max(te(JSON.stringify(recReal)).length, te(JSON.stringify(recDecoy)).length));
+  const volReal = await sealWith(K.enc, recReal, target);
+  const volDecoy = await sealWith(Kd.enc, recDecoy, target);
+  const vols = [];
+  vols[realIdx] = { vfy: K.vfy, ...volReal };
+  vols[decoyIdx] = { vfy: Kd.vfy, ...volDecoy };
+
+  const file = {
+    f: "eph", v: 2, ver: VER, kdf, s: b64.enc(salt), p: target, vols,
+    /* always present so that a file with a wipe passphrase and one without
+       are the same shape. Random until one is set. */
+    w: { vfy: b64.enc(crypto.getRandomValues(new Uint8Array(16))), x: b64.enc(crypto.getRandomValues(new Uint8Array(28))) },
+    att: { n: 0, until: 0 }
+  };
+  rawWrite(file);
+  $("pp1").value = $("pp2").value = $("ppd").value = "";
+  $("btnCreate").disabled = false;
+  S.file = file; S.key = K.enc; S.slot = realIdx; S.salt = salt; S.data = recReal; S.target = target;
+  openApp();
+}
+
+async function unlock() {
+  const pass = $("pp").value;
+  const msg = $("unlockMsg");
+  if (!pass) { msg.className = "gatemsg err"; msg.textContent = "Enter the passphrase."; return; }
+  const file = rawRead();
+  if (!file || file.v !== 2) { msg.className = "gatemsg err"; msg.textContent = "There is no record on this device."; return; }
+  const wait = Math.ceil(((file.att && file.att.until || 0) - Date.now()) / 1000);
+  if (wait > 0) { msg.className = "gatemsg err"; msg.textContent = "Too many attempts. Wait " + wait + " seconds."; return; }
+  msg.className = "gatemsg dim"; msg.textContent = "Working out the key. This is deliberately slow.";
+  $("btnUnlock").disabled = true;
+  await new Promise(r => setTimeout(r, 40));
+
+  const salt = b64.dec(file.s);
+  const K = await deriveAll(pass, salt, file.kdf || kdfOf(64));
+
+  if (file.w && sameVfy(K.vfy, file.w.vfy)) { await runWipe(file, K); return; }
+
+  for (let i = 0; i < file.vols.length; i++) {
+    if (!sameVfy(K.vfy, file.vols[i].vfy)) continue;
+    try {
+      const rec = await openWith(K.enc, file.vols[i]);
+      file.att = { n: 0, until: 0 }; rawWrite(file);
+      S.file = file; S.key = K.enc; S.slot = i; S.salt = salt; S.data = rec; S.target = file.p || PAD_MIN;
+      $("pp").value = ""; $("btnUnlock").disabled = false; msg.textContent = "";
+      if (rec.role === "real" && await deadlinePassed(rec)) {
+        await destroySlot(file, i);
+        S.key = null; S.data = null; S.slot = null; S.file = null; S.salt = null;
+        failUnlock(file, msg); return;
+      }
+      openApp();
+      if (rec.role === "real") { rec.safety = rec.safety || {}; rec.safety.lastOpen = D.today(); await persist(); await upkeepDecoy(); }
+      return;
+    } catch (e) { dbg("verifier matched but the volume would not open", e.message); }
+  }
+  failUnlock(file, msg);
+}
+function failUnlock(file, msg) {
+  file.att = file.att || { n: 0, until: 0 };
+  file.att.n++;
+  const delay = Math.min(60000, Math.pow(2, Math.max(0, file.att.n - 3)) * 1000);
+  file.att.until = file.att.n >= 3 ? Date.now() + delay : 0;
+  rawWrite(file);
+  $("btnUnlock").disabled = false;
+  msg.className = "gatemsg err";
+  msg.textContent = "That passphrase does not open anything here.";
+}
+
+/* A wipe passphrase destroys the real volume and then reports exactly what a
+   wrong passphrase reports. Nothing on screen says what happened. */
+async function runWipe(file, K) {
+  let realIdx = null;
+  try {
+    const idxBuf = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64.dec(file.w.x).slice(0, 12) }, K.wipe, b64.dec(file.w.x).slice(12));
+    const decoyIdx = new Uint8Array(idxBuf)[0];
+    realIdx = 1 - decoyIdx;
+  } catch (e) { dbg("wipe marker unreadable"); }
+  if (realIdx === 0 || realIdx === 1) await destroySlot(file, realIdx);
+  failUnlock(file, $("unlockMsg"));
+}
+/* getRandomValues refuses more than 65536 bytes in one call, and a volume is
+   larger than that, so the overwrite is filled a block at a time. */
+function randBytes(n) {
+  const b = new Uint8Array(n);
+  for (let o = 0; o < n; o += 65536) crypto.getRandomValues(b.subarray(o, Math.min(n, o + 65536)));
+  return b;
+}
+async function destroySlot(file, i) {
+  const len = b64.dec(file.vols[i].c).length;
+  file.vols[i] = {
+    vfy: b64.enc(randBytes(16)),
+    i: b64.enc(randBytes(12)),
+    c: b64.enc(randBytes(len))
+  };
+  rawWrite(file);
+  dbg("slot", i, "overwritten");
+}
+async function deadlinePassed(rec) {
+  const sf = rec.safety || {};
+  if (!sf.deadDays || !sf.lastOpen) return false;
+  return D.diff(sf.lastOpen, D.today()) > sf.deadDays;
+}
+
+/* Clearing the device is offered from the gate, from the Record station, and
+   from the Safety station. Same panel every time: the warning, the offer of a
+   sealed copy, then a deliberate second press. Easy to reach, hard to do by
+   accident. */
+function askClear(host) {
+  if (host.firstElementChild) { host.innerHTML = ""; return; }
+  const box = el("div", { style: "margin-top:12px" });
+  box.appendChild(el("div", { class: "notice danger", text: "This removes both records from this device. Any passphrase for them will no longer open anything here. There is no undo." }));
+  box.appendChild(el("p", { class: "dim", style: "font-size:.9em", text: "A sealed copy stays sealed. Keeping one costs you nothing now and is the only thing that can rescue a record later." }));
+  const row = el("div", { class: "row" });
+  const backup = el("button", { type: "button", text: "Save a sealed copy first" });
+  backup.addEventListener("click", exportSealed);
+  const go = el("button", { type: "button", text: "Erase and start over" });
+  go.addEventListener("click", () => {
+    if (!confirm("Clear this device? What is here now can never be opened again.")) return;
+    host.innerHTML = "";
+    startOver();
+    toast("This device was cleared");
+  });
+  const no = el("button", { type: "button", text: "Cancel" });
+  no.addEventListener("click", () => { host.innerHTML = ""; });
+  [backup, go, no].forEach(b => row.appendChild(b));
+  box.appendChild(row);
+  host.appendChild(box);
+  backup.focus();
+}
+
+/* There has to be a way out of the gate. A wipe passphrase, a forgotten
+   passphrase, or a record from a version this one cannot read all leave a file
+   on the device that opens nothing, and without this the app would sit on the
+   unlock screen forever with no way back to setup. */
+function startOver() {
+  try { localStorage.removeItem(STORE_KEY); } catch (e) { dbg("storage clear blocked", e.message); }
+  window.__ephMem = null;
+  S.key = null; S.data = null; S.slot = null; S.salt = null; S.file = null; S.selDate = null;
+  clearTimeout(S.idleTimer);
+  $("freshPanel").classList.add("hide");
+  $("gateUnlock").classList.add("hide");
+  $("gateSetup").classList.remove("hide");
+  $("app").classList.add("hide");
+  $("gate").classList.remove("hide");
+  $("pp").value = ""; $("pp1").value = ""; $("pp2").value = ""; $("ppd").value = "";
+  $("unlockMsg").textContent = "";
+  $("setupMsg").className = "gatemsg dim";
+  $("setupMsg").textContent = "This device was cleared. Nothing that was here can be opened again.";
+  $("ppMeterLab").textContent = "";
+  $("ppMeter").className = "meter";
+  $("ppMeter").firstElementChild.style.width = "0";
+  $("pp1").focus();
+}
+function lock() {
+  S.key = null; S.data = null; S.slot = null; S.salt = null; S.file = null; S.selDate = null;
+  clearTimeout(S.idleTimer);
+  $("app").classList.add("hide");
+  $("gate").classList.remove("hide");
+  $("gateSetup").classList.add("hide");
+  $("gateUnlock").classList.remove("hide");
+  $("unlockMsg").textContent = ""; $("pp").value = "";
+  $("safeOpen").classList.add("hide"); $("safeLocked").classList.remove("hide");
+  $("dialHost").innerHTML = ""; $("calGrid").innerHTML = ""; $("bbtHost").innerHTML = "";
+  const t = $("cycTable").querySelector("tbody"); if (t) t.innerHTML = "";
+  $("pp").focus();
+}
+function touchIdle() {
+  clearTimeout(S.idleTimer);
+  const secs = Number(S.data && S.data.prefs ? S.data.prefs.idle : 180);
+  if (secs > 0) S.idleTimer = setTimeout(() => { toast("Locked after idle"); lock(); }, secs * 1000);
+}
+
+/* ---------- model ---------- */
+const FLOWS = [["0", "none"], ["1", "spotting"], ["2", "light"], ["3", "medium"], ["4", "heavy"]];
+const SCALE = ["none", "slight", "marked", "severe"];
+function symList() { return (S.data && S.data.syms) || DEFAULT_SYMS.map(([k, name]) => ({ k, name })); }
+function days() { return S.data.days || {}; }
+function liveDays() { const o = {}, d = days(); for (const k in d) if (!d[k].x) o[k] = d[k]; return o; }
+function dayOf(iso) { return days()[iso] || null; }
+function setDay(iso, patch) {
+  const d = days();
+  d[iso] = Object.assign({ f: 0, s: {}, n: "" }, d[iso] || {}, patch);
+  S.data.days = d;
+}
+function dayHasMarks(r) {
+  if (!r) return false;
+  if (r.t != null || r.m != null || r.l != null) return true;
+  if (r.n || r.med || r.tst) return true;
+  if (r.s) for (const k in r.s) if (r.s[k] > 0) return true;
+  return false;
+}
+function cycles() {
+  const d = liveDays();
+  const bleed = Object.keys(d).filter(k => (d[k].f || 0) >= 2).sort();
+  const anyBleed = new Set(Object.keys(d).filter(k => (d[k].f || 0) >= 1));
+  const realBleed = new Set(bleed);
+  const starts = [];
+  for (const iso of bleed) {
+    /* a start is real bleeding with no real bleeding in the three days before
+       it. Spotting in the days before a period is common and must not stop a
+       cycle from opening, so only flow of light or more counts as a run. */
+    let recent = false;
+    for (let i = 1; i <= 3; i++) if (realBleed.has(D.add(iso, -i))) { recent = true; break; }
+    if (!recent) starts.push(iso);
+  }
+  const out = [];
+  for (let i = 0; i < starts.length; i++) {
+    const start = starts[i];
+    let bleedDays = 0, peak = 0, recalled = false;
+    for (let n = 0; n < 15; n++) {
+      const iso = D.add(start, n), r = d[iso];
+      if (r && (r.f || 0) >= 1) { bleedDays++; peak = Math.max(peak, r.f); if (r.r) recalled = true; }
+      else if (n > 0 && !anyBleed.has(iso) && !anyBleed.has(D.add(iso, 1))) break;
+    }
+    const len = (i + 1 < starts.length) ? D.diff(start, starts[i + 1]) : null;
+    out.push({ start, len, bleedDays, peak, recalled });
+  }
+  return out;
+}
+
+/* Prediction. A normal prior on cycle length updated by the recorded cycles,
+   with recalled cycles and older cycles carrying less weight. Wide when the
+   record is thin, narrowing as it grows, instead of pretending at n=1. */
+const PRIOR_MEAN = 29, PRIOR_SD = 4, PRIOR_OBS_SD = 4, PRIOR_OBS_W = 2;
+function normCdf(z) { return 0.5 * (1 + erf(z / Math.SQRT2)); }
+function erf(x) {
+  const s = x < 0 ? -1 : 1; x = Math.abs(x);
+  const t = 1 / (1 + 0.3275911 * x);
+  const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
+  return s * y;
+}
+function predict(cy) {
+  const obs = [];
+  const usable = cy.filter(c => c.len && c.len >= 15 && c.len <= 90);
+  const n = usable.length;
+  usable.forEach((c, i) => {
+    const age = n - 1 - i;
+    let w = Math.pow(0.5, age / 6);          /* half weight every six cycles back */
+    if (c.recalled) w *= 0.4;                /* memory is not observation */
+    obs.push({ x: c.len, w });
+  });
+  const W = obs.reduce((a, o) => a + o.w, 0);
+  if (!W) return { n: 0, mean: null, sd: null, predSd: null };
+  const xbar = obs.reduce((a, o) => a + o.x * o.w, 0) / W;
+  const ss = obs.reduce((a, o) => a + o.w * (o.x - xbar) ** 2, 0);
+  const obsSd = Math.sqrt((PRIOR_OBS_W * PRIOR_SD * PRIOR_SD + ss) / (PRIOR_OBS_W + W));
+  const sd = Math.max(obsSd, 1.2);
+  const postVar = 1 / (1 / (PRIOR_SD * PRIOR_SD) + W / (sd * sd));
+  const postMean = postVar * (PRIOR_MEAN / (PRIOR_SD * PRIOR_SD) + W * xbar / (sd * sd));
+  const predSd = Math.sqrt(sd * sd + postVar);
+  return { n, W, mean: postMean, sd, predSd, plain: xbar };
+}
+function stats() {
+  const cy = cycles();
+  const p = predict(cy);
+  const last = cy.length ? cy[cy.length - 1].start : null;
+  let pred = null, lo = null, hi = null, spread = null;
+  if (last && p.mean) {
+    const m = Math.round(p.mean);
+    spread = Math.max(1, Math.round(1.2816 * p.predSd));   /* an 80 in 100 range */
+    pred = D.add(last, m); lo = D.add(last, m - spread); hi = D.add(last, m + spread);
+  }
+  const lens = cy.map(c => c.len).filter(x => x && x >= 15 && x <= 90);
+  const pLens = cy.map(c => c.bleedDays).filter(x => x > 0);
+  return {
+    cycles: cy, n: lens.length, mean: p.mean, plain: p.plain, sd: p.sd, predSd: p.predSd,
+    last, pred, lo, hi, spread,
+    min: lens.length ? Math.min(...lens) : null, max: lens.length ? Math.max(...lens) : null,
+    periodMean: pLens.length ? pLens.reduce((a, b) => a + b, 0) / pLens.length : null
+  };
+}
+/* where today sits in the predicted distribution, rather than a count of days late */
+function placement(st) {
+  if (!st.last || !st.mean) return null;
+  const dayOfCycle = D.diff(st.last, D.today()) + 1;
+  const z = (D.diff(st.last, D.today()) - st.mean) / st.predSd;
+  const pct = Math.round(normCdf(z) * 100);
+  return { dayOfCycle, pct };
+}
+function trends() {
+  const cy = cycles();
+  const out = [];
+  const lens = cy.filter(c => c.len && c.len >= 15 && c.len <= 90);
+  if (lens.length >= 4) {
+    const xs = lens.map((_, i) => i), ys = lens.map(c => c.len);
+    const mx = xs.reduce((a, b) => a + b) / xs.length, my = ys.reduce((a, b) => a + b) / ys.length;
+    let num = 0, den = 0;
+    xs.forEach((x, i) => { num += (x - mx) * (ys[i] - my); den += (x - mx) ** 2; });
+    const slope = den ? num / den : 0;
+    if (Math.abs(slope) >= 0.5) out.push({
+      kind: slope > 0 ? "warnc" : "warnc",
+      text: "Cycle length has been " + (slope > 0 ? "lengthening" : "shortening") + " by about " + Math.abs(slope).toFixed(1) + " days per cycle across the last " + lens.length + " cycles."
+    });
+    const recent = lens.slice(-3).map(c => c.len), earlier = lens.slice(0, -3).map(c => c.len);
+    if (earlier.length >= 3) {
+      const sdOf = a => { const m = a.reduce((x, y) => x + y) / a.length; return Math.sqrt(a.reduce((x, y) => x + (y - m) ** 2, 0) / (a.length - 1)); };
+      const sr = sdOf(recent), se = sdOf(earlier);
+      if (se > 0.5 && sr > se * 2) out.push({ kind: "warnc", text: "The last three cycles vary more than the ones before them." });
+      if (sr > 0.5 && se > sr * 2) out.push({ kind: "okc", text: "The last three cycles have been steadier than the ones before them." });
+    }
+  }
+  const bd = cy.map(c => c.bleedDays).filter(x => x > 0);
+  if (bd.length >= 4) {
+    const first = bd.slice(0, Math.floor(bd.length / 2)), last = bd.slice(-Math.floor(bd.length / 2));
+    const mf = first.reduce((a, b) => a + b) / first.length, ml = last.reduce((a, b) => a + b) / last.length;
+    if (ml - mf >= 1.5) out.push({ kind: "warnc", text: "Bleeding days have gone up, from about " + mf.toFixed(1) + " to about " + ml.toFixed(1) + " per cycle." });
+  }
+  const short = cy.filter(c => c.len && c.len < 21).length, long = cy.filter(c => c.len && c.len > 35).length;
+  if (short) out.push({ kind: "warnc", text: short + " recorded cycle" + (short > 1 ? "s were" : " was") + " shorter than 21 days." });
+  if (long) out.push({ kind: "warnc", text: long + " recorded cycle" + (long > 1 ? "s were" : " was") + " longer than 35 days." });
+  const heavy = Object.values(liveDays()).filter(r => r.f === 4).length;
+  if (heavy >= 12) out.push({ kind: "warnc", text: heavy + " days have been marked heavy. Worth mentioning if it is new." });
+  if (!out.length) out.push({ kind: "okc", text: cy.length < 4 ? "Not enough cycles yet to say anything about change. Four is roughly where this starts to mean something." : "Nothing in the record is drifting enough to call out." });
+  return out;
+}
+
+/* ---------- the dial ---------- */
+function drawDial() {
+  const st = stats();
+  const cy = st.cycles.slice(-9);
+  const host = $("dialHost");
+  host.innerHTML = "";
+  if (!cy.length) {
+    host.appendChild(el("p", { class: "dim", text: "Nothing recorded yet. Started today, up at the top, is the fastest way in. The dial draws itself once there is a cycle to draw." }));
+    $("dialHead").textContent = "The dial";
+    $("predLine").textContent = ""; $("predCaveat").textContent = ""; $("wherePlaced").innerHTML = "";
+    return;
+  }
+  const scale = Math.max(35, ...cy.map(c => c.len || 0)) + 1;
+  const SZ = 520, C = SZ / 2, R0 = 62, R1 = 232;
+  const step = cy.length > 1 ? (R1 - R0) / (cy.length - 1) : 0;
+  const thick = Math.max(7, Math.min(18, step * .62 || 18));
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", "0 0 " + SZ + " " + SZ);
+  svg.setAttribute("class", "dial"); svg.setAttribute("role", "img");
+  const ang = (day) => (day / scale) * 2 * Math.PI - Math.PI / 2;
+  const pt = (r, a) => [C + r * Math.cos(a), C + r * Math.sin(a)];
+  function arc(r, t, d0, d1, fill) {
+    const a0 = ang(d0), a1 = ang(d1), ro = r + t / 2, ri = r - t / 2;
+    const large = (a1 - a0) > Math.PI ? 1 : 0;
+    const [x0, y0] = pt(ro, a0), [x1, y1] = pt(ro, a1), [x2, y2] = pt(ri, a1), [x3, y3] = pt(ri, a0);
+    const p = document.createElementNS(NS, "path");
+    p.setAttribute("d", "M" + x0 + " " + y0 + " A" + ro + " " + ro + " 0 " + large + " 1 " + x1 + " " + y1 +
+      " L" + x2 + " " + y2 + " A" + ri + " " + ri + " 0 " + large + " 0 " + x3 + " " + y3 + " Z");
+    p.setAttribute("fill", fill); svg.appendChild(p); return p;
+  }
+  for (let dv = 0; dv < scale; dv += 7) {
+    const a = ang(dv);
+    const [x0, y0] = pt(R0 - 14, a), [x1, y1] = pt(R1 + 14, a);
+    const l = document.createElementNS(NS, "line");
+    l.setAttribute("x1", x0); l.setAttribute("y1", y0); l.setAttribute("x2", x1); l.setAttribute("y2", y1);
+    l.setAttribute("stroke", "var(--edge)"); l.setAttribute("stroke-width", "1"); l.setAttribute("opacity", ".5"); svg.appendChild(l);
+    const [tx, ty] = pt(R1 + 30, a);
+    const tn = document.createElementNS(NS, "text");
+    tn.setAttribute("x", tx); tn.setAttribute("y", ty); tn.setAttribute("fill", "var(--dim)");
+    tn.setAttribute("font-size", "13"); tn.setAttribute("font-family", "ui-monospace, monospace");
+    tn.setAttribute("text-anchor", "middle"); tn.setAttribute("dominant-baseline", "middle");
+    tn.textContent = dv === 0 ? "1" : String(dv + 1); svg.appendChild(tn);
+  }
+  const dd = liveDays();
+  cy.forEach((c, i) => {
+    const r = R0 + step * i;
+    const ring = document.createElementNS(NS, "circle");
+    ring.setAttribute("cx", C); ring.setAttribute("cy", C); ring.setAttribute("r", r);
+    ring.setAttribute("fill", "none"); ring.setAttribute("stroke", "var(--edge)");
+    ring.setAttribute("stroke-width", Math.max(1, thick * .9));
+    ring.setAttribute("opacity", c.recalled ? ".2" : ".35");
+    if (c.recalled) ring.setAttribute("stroke-dasharray", "2 4");
+    svg.appendChild(ring);
+    const span = c.len || (D.diff(c.start, D.today()) + 1);
+    for (let n = 0; n < span; n++) {
+      const rec = dd[D.add(c.start, n)];
+      if (!rec || !(rec.f > 0)) continue;
+      const fill = rec.f >= 2 ? "var(--mark)" : "var(--mark-dim)";
+      const a = arc(r, rec.f >= 3 ? thick : thick * .7, n, n + 1, fill);
+      a.setAttribute("opacity", rec.r ? ".55" : (rec.f >= 3 ? "1" : ".9"));
+      const ttl = document.createElementNS(NS, "title");
+      ttl.textContent = D.human(D.add(c.start, n)) + ", day " + (n + 1) + ", " + FLOWS[rec.f][1] + (rec.r ? ", from memory" : "");
+      a.appendChild(ttl);
+    }
+  });
+  if (st.pred) {
+    const lo = D.diff(st.last, st.lo), hi = D.diff(st.last, st.hi), rB = R1 + 44;
+    arc(rB, 16, Math.max(0, Math.min(lo, scale - 1)), Math.min(hi, scale), "var(--band)");
+    const a = ang(Math.min(D.diff(st.last, st.pred), scale));
+    const [x0, y0] = pt(rB - 12, a), [x1, y1] = pt(rB + 12, a);
+    const l = document.createElementNS(NS, "line");
+    l.setAttribute("x1", x0); l.setAttribute("y1", y0); l.setAttribute("x2", x1); l.setAttribute("y2", y1);
+    l.setAttribute("stroke", "var(--brass)"); l.setAttribute("stroke-width", "2"); svg.appendChild(l);
+  }
+  const hub = document.createElementNS(NS, "circle");
+  hub.setAttribute("cx", C); hub.setAttribute("cy", C); hub.setAttribute("r", R0 - 24);
+  hub.setAttribute("fill", "none"); hub.setAttribute("stroke", "var(--brass-dim)"); svg.appendChild(hub);
+  const cap = document.createElementNS(NS, "text");
+  cap.setAttribute("x", C); cap.setAttribute("y", C); cap.setAttribute("text-anchor", "middle");
+  cap.setAttribute("dominant-baseline", "middle"); cap.setAttribute("fill", "var(--brass)");
+  cap.setAttribute("font-size", "26"); cap.setAttribute("font-family", "ui-monospace, monospace");
+  cap.textContent = st.mean ? st.mean.toFixed(1) : String(cy.length); svg.appendChild(cap);
+  const cap2 = document.createElementNS(NS, "text");
+  cap2.setAttribute("x", C); cap2.setAttribute("y", C + 22); cap2.setAttribute("text-anchor", "middle");
+  cap2.setAttribute("fill", "var(--dim)"); cap2.setAttribute("font-size", "11");
+  cap2.setAttribute("font-family", "ui-monospace, monospace"); cap2.setAttribute("letter-spacing", "2");
+  cap2.textContent = st.mean ? "DAYS EXPECTED" : "CYCLES"; svg.appendChild(cap2);
+  svg.setAttribute("aria-label", "Cycle dial. " + cy.length + " cycles drawn, innermost oldest." + (st.mean ? " Expected length " + st.mean.toFixed(1) + " days." : ""));
+  host.appendChild(svg);
+  $("dialHead").textContent = cy.length + (cy.length === 1 ? " cycle recorded" : " cycles recorded");
+
+  const line = $("predLine"), cav = $("predCaveat"), wh = $("wherePlaced");
+  wh.innerHTML = "";
+  if (!st.pred) { line.textContent = "Not enough recorded yet."; cav.textContent = "One full cycle is needed before anything can be predicted."; return; }
+  line.textContent = D.human(st.pred) + "   (4 times in 5, between " + D.human(st.lo) + " and " + D.human(st.hi) + ")";
+  const pl = placement(st);
+  if (pl) {
+    const chip = el("span", { class: "chip " + (pl.pct > 90 ? "warnc" : "okc") });
+    chip.textContent = "Today is day " + pl.dayOfCycle + ". About " + pl.pct + " in 100 cycles like yours would have started by now.";
+    wh.appendChild(chip);
+  }
+  cav.textContent = st.n < 3
+    ? "Worked from " + st.n + " recorded cycle" + (st.n === 1 ? "" : "s") + " and a general prior, which is why the range is wide. It narrows as the record grows."
+    : "Worked from " + st.n + " cycles, expected " + st.mean.toFixed(1) + " days, spread " + st.predSd.toFixed(1) + ". Recent cycles count for more, and anything filled in from memory counts for less. This is arithmetic on your own history, not a forecast anyone can guarantee.";
+}
+
+/* ---------- calendar, day sheet, quick marks, backfill ---------- */
+function drawCal() {
+  const g = $("calGrid"); g.innerHTML = "";
+  const m = S.calMonth, first = D.parse(m + "-01");
+  $("calTitle").textContent = first.toLocaleDateString(undefined, { timeZone: "UTC", month: "long", year: "numeric" });
+  ["S", "M", "T", "W", "T", "F", "S"].forEach(d => g.appendChild(el("div", { class: "dow", text: d, "aria-hidden": "true" })));
+  const lead = first.getUTCDay();
+  const dim = new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0)).getUTCDate();
+  for (let i = 0; i < lead; i++) g.appendChild(el("div", { class: "day blank" }));
+  const st = stats(), dd = liveDays();
+  for (let n = 1; n <= dim; n++) {
+    const iso = m + "-" + String(n).padStart(2, "0");
+    const rec = dd[iso];
+    const b = el("button", { class: "day", type: "button", text: String(n) });
+    b.dataset.iso = iso;
+    if (rec && rec.f > 0) b.dataset.flow = String(rec.f);
+    if (rec && rec.r) b.classList.add("recall");
+    if (dayHasMarks(rec)) b.appendChild(el("span", { class: "dot", "aria-hidden": "true" }));
+    if (st.pred && st.lo && iso >= st.lo && iso <= st.hi && (!rec || !rec.f)) b.classList.add("pred");
+    if (iso === S.selDate) b.classList.add("sel");
+    let lab = D.human(iso);
+    if (rec && rec.f > 0) lab += ", " + FLOWS[rec.f][1];
+    if (rec && rec.r) lab += ", from memory";
+    if (dayHasMarks(rec)) lab += ", has notes";
+    b.setAttribute("aria-label", lab);
+    b.addEventListener("click", () => { if (!S.painting) selectDay(iso); });
+    b.addEventListener("pointerdown", (e) => { S.painting = { from: iso, moved: false }; b.setPointerCapture && b.setPointerCapture(e.pointerId); });
+    b.addEventListener("pointerenter", () => { if (S.painting) { S.painting.moved = true; S.painting.to = iso; markPaint(); } });
+    g.appendChild(b);
+  }
+}
+function markPaint() {
+  const p = S.painting; if (!p || !p.to) return;
+  const a = p.from < p.to ? p.from : p.to, b = p.from < p.to ? p.to : p.from;
+  [...$("calGrid").querySelectorAll(".day[data-iso]")].forEach(n => {
+    n.classList.toggle("sel", n.dataset.iso >= a && n.dataset.iso <= b);
+  });
+}
+async function endPaint() {
+  const p = S.painting; S.painting = null;
+  if (!p || !p.moved || !p.to) return;
+  const a = p.from < p.to ? p.from : p.to, b = p.from < p.to ? p.to : p.from;
+  const n = D.diff(a, b) + 1;
+  for (let i = 0; i < n; i++) setDay(D.add(a, i), { f: 3, x: false });
+  await persist(); refresh(); selectDay(a);
+  toast(n + " days marked");
+}
+function buildEditor() {
+  const f = $("edFlow"); f.innerHTML = "";
+  FLOWS.forEach(([v, name]) => {
+    const b = el("button", { type: "button", text: name, "aria-pressed": "false" });
+    b.dataset.flow = v;
+    b.addEventListener("click", () => { [...f.children].forEach(c => c.setAttribute("aria-pressed", "false")); b.setAttribute("aria-pressed", "true"); });
+    f.appendChild(b);
+  });
+  const g = $("edSyms"); g.innerHTML = "";
+  symList().forEach(({ k, name }) => {
+    const wrap = el("div");
+    wrap.appendChild(el("label", { for: "sym-" + k, text: name }));
+    const sel = el("select", { id: "sym-" + k });
+    SCALE.forEach((s, i) => sel.appendChild(el("option", { value: String(i), text: s })));
+    wrap.appendChild(sel); g.appendChild(wrap);
+  });
+}
+function selectDay(iso) {
+  S.selDate = iso;
+  const r = dayOf(iso) || {};
+  $("editTitle").textContent = D.human(iso) + (r.r ? "  (from memory)" : "");
+  $("sigDate").textContent = D.human(iso);
+  $("sigDay").value = iso;
+  [...$("edFlow").children].forEach(c => c.setAttribute("aria-pressed", String(Number(c.dataset.flow) === (r.f || 0))));
+  symList().forEach(({ k }) => { const s = $("sym-" + k); if (s) s.value = String((r.s && r.s[k]) || 0); });
+  $("edMeds").value = r.med || ""; $("edTest").value = r.tst || ""; $("edNote").value = r.n || "";
+  $("edTemp").value = r.t != null ? r.t : ""; $("edMucus").value = r.m != null ? String(r.m) : "";
+  $("edLh").value = r.l != null ? String(r.l) : "";
+  $("edState").textContent = r.x ? "This day is archived. Saving brings it back." : "";
+  drawCal();
+}
+/* If nothing is picked, the sheet belongs to today. This sets the day without
+   repopulating the fields, which would throw away what was just typed. */
+function ensureDay() {
+  if (S.selDate) return;
+  S.selDate = D.today();
+  $("editTitle").textContent = D.human(S.selDate);
+  $("sigDate").textContent = D.human(S.selDate);
+  $("sigDay").value = S.selDate;
+}
+async function saveDay() {
+  ensureDay();
+  const flowBtn = [...$("edFlow").children].find(c => c.getAttribute("aria-pressed") === "true");
+  const s = {}; symList().forEach(({ k }) => { const v = Number($("sym-" + k).value); if (v) s[k] = v; });
+  setDay(S.selDate, {
+    f: flowBtn ? Number(flowBtn.dataset.flow) : 0, s,
+    med: $("edMeds").value.trim(), tst: $("edTest").value.trim(), n: $("edNote").value.trim(), x: false, r: false
+  });
+  await persist(); refresh();
+  $("edState").textContent = "Saved " + D.human(S.selDate) + ".";
+  toast("Day saved");
+}
+async function archiveDay() {
+  if (!S.selDate || !dayOf(S.selDate)) { toast("Nothing recorded on that day"); return; }
+  setDay(S.selDate, { x: true });
+  await persist(); refresh();
+  $("edState").textContent = "Archived. It stays in the record and can be brought back from the Record station.";
+  toast("Day archived");
+}
+/* Started today and bleeding today are the same write. A start is derived from
+   the record rather than declared, so there is nothing extra to store, and the
+   two buttons exist only because they are what people reach for. */
+async function quick(kind) {
+  const t = D.today();
+  if (kind === "start" || kind === "today") {
+    setDay(t, { f: 3, x: false, r: false });
+    toast(kind === "start" ? "Marked as started today" : "Marked bleeding today");
+  }
+  if (kind === "end") {
+    let last = null;
+    for (let i = 0; i <= 12; i++) { const iso = D.add(t, -i); const r = dayOf(iso); if (r && r.f > 0 && !r.x) { last = iso; break; } }
+    if (!last) { toast("Nothing recent to close off"); return; }
+    setDay(last, { f: Math.min(dayOf(last).f, 1) });
+    toast("Closed off at " + D.human(last));
+  }
+  S.calMonth = t.slice(0, 7);
+  await persist(); refresh(); selectDay(t);
+}
+async function backfill() {
+  const last = $("bfLast").value, len = Number($("bfLen").value), bd = Number($("bfDays").value), count = Number($("bfCount").value);
+  const st = $("bfState");
+  if (!last || !/^\d{4}-\d{2}-\d{2}$/.test(last)) { st.className = "err"; st.textContent = "Enter the most recent start you remember."; return; }
+  if (!(len >= 15 && len <= 90) || !(bd >= 1 && bd <= 14) || !(count >= 1 && count <= 24)) { st.className = "err"; st.textContent = "Check the numbers. Length 15 to 90, bleeding days 1 to 14, up to 24 cycles."; return; }
+  let made = 0;
+  for (let c = 0; c < count; c++) {
+    const start = D.add(last, -len * c);
+    for (let i = 0; i < bd; i++) {
+      const iso = D.add(start, i);
+      if (dayOf(iso)) continue;
+      setDay(iso, { f: i === bd - 1 ? 1 : 3, r: true, x: false });
+      made++;
+    }
+  }
+  await persist(); refresh();
+  st.className = "dim";
+  st.textContent = made + " days filled in from memory across " + count + " cycles. They are marked as recalled and count for less.";
+  toast("Filled in " + count + " cycles");
+}
+
+/* ---------- signals ---------- */
+async function saveSignals() {
+  ensureDay();
+  const t = $("edTemp").value.trim(), m = $("edMucus").value, l = $("edLh").value;
+  const patch = { x: false };
+  patch.t = t === "" ? null : Number(t);
+  patch.m = m === "" ? null : Number(m);
+  patch.l = l === "" ? null : Number(l);
+  setDay(S.selDate, patch);
+  S.data.prefs.unit = $("edUnit").value;
+  await persist(); refresh();
+  $("sigState").textContent = "Saved for " + D.human(S.selDate) + ".";
+  toast("Readings saved");
+}
+function drawBBT() {
+  const host = $("bbtHost"); host.innerHTML = "";
+  const st = stats();
+  const start = st.last || D.add(D.today(), -28);
+  const dd = liveDays(), pts = [];
+  for (let n = 0; n < 40; n++) {
+    const iso = D.add(start, n);
+    if (D.diff(iso, D.today()) < 0) break;
+    const r = dd[iso];
+    if (r && r.t != null) pts.push({ n, iso, t: r.t, m: r.m, l: r.l });
+  }
+  if (pts.length < 3) {
+    host.appendChild(el("p", { class: "dim", text: "Three waking temperatures in the current cycle will draw the chart. Take it at the same time each morning, before getting up." }));
+    $("bbtRead").textContent = "";
+    return;
+  }
+  const W = 700, H = 260, PL = 46, PR = 12, PT = 14, PB = 26;
+  const temps = pts.map(p => p.t);
+  const lo = Math.min(...temps) - .15, hi = Math.max(...temps) + .15;
+  const xs = n => PL + (n / 39) * (W - PL - PR);
+  const ys = t => PT + (1 - (t - lo) / (hi - lo)) * (H - PT - PB);
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", "0 0 " + W + " " + H); svg.setAttribute("class", "chart"); svg.setAttribute("role", "img");
+  const mk = (t, a) => { const n = document.createElementNS(NS, t); for (const k in a) n.setAttribute(k, a[k]); svg.appendChild(n); return n; };
+  for (let i = 0; i <= 4; i++) {
+    const t = lo + (hi - lo) * i / 4, y = ys(t);
+    mk("line", { x1: PL, y1: y, x2: W - PR, y2: y, stroke: "var(--edge)", "stroke-width": 1, opacity: .55 });
+    const tx = mk("text", { x: 4, y: y + 4, fill: "var(--dim)", "font-size": 11, "font-family": "ui-monospace, monospace" });
+    tx.textContent = t.toFixed(2);
+  }
+  let cover = null;
+  for (let i = 6; i < pts.length; i++) {
+    const prior = pts.slice(i - 6, i).map(p => p.t), me = pts.slice(i, i + 3).map(p => p.t);
+    if (me.length < 3) break;
+    const high = Math.max(...prior);
+    if (me.every(t => t > high)) { cover = { line: high, at: pts[i].n }; break; }
+  }
+  if (cover) {
+    mk("line", { x1: PL, y1: ys(cover.line), x2: W - PR, y2: ys(cover.line), stroke: "var(--brass)", "stroke-width": 1.5, "stroke-dasharray": "6 4" });
+    mk("line", { x1: xs(cover.at), y1: PT, x2: xs(cover.at), y2: H - PB, stroke: "var(--brass-dim)", "stroke-width": 1 });
+  }
+  let d = "";
+  pts.forEach((p, i) => { d += (i ? " L" : "M") + xs(p.n) + " " + ys(p.t); });
+  mk("path", { d, fill: "none", stroke: "var(--ink)", "stroke-width": 1.5 });
+  pts.forEach(p => {
+    const c = mk("circle", { cx: xs(p.n), cy: ys(p.t), r: 3.5, fill: p.l === 1 ? "var(--brass)" : "var(--ink)" });
+    const ttl = document.createElementNS(NS, "title");
+    ttl.textContent = D.human(p.iso) + ", day " + (p.n + 1) + ", " + p.t + (p.l === 1 ? ", LH positive" : "");
+    c.appendChild(ttl);
+    if (p.m === 4) mk("rect", { x: xs(p.n) - 3, y: H - PB + 6, width: 6, height: 6, fill: "var(--good)" });
+  });
+  for (let n = 0; n < 40; n += 7) {
+    const tx = mk("text", { x: xs(n), y: H - 6, fill: "var(--dim)", "font-size": 11, "font-family": "ui-monospace, monospace", "text-anchor": "middle" });
+    tx.textContent = String(n + 1);
+  }
+  svg.setAttribute("aria-label", "Waking temperature chart for the current cycle, " + pts.length + " readings" + (cover ? ", with a rise established" : ""));
+  host.appendChild(svg);
+  $("bbtRead").textContent = cover
+    ? "A sustained rise is visible from day " + (cover.at + 1) + ". Three readings above the six before them. This describes what already happened. It does not mark a safe day."
+    : "No sustained rise yet in this cycle.";
+}
+
+/* ---------- table, trends, archive ---------- */
+function drawTable() {
+  const st = stats();
+  const h = $("statHost"); h.innerHTML = "";
+  const line = (k, v) => { const p = el("p", { class: "mono", style: "margin:.2em 0" }); p.textContent = k + ": " + v; h.appendChild(p); };
+  line("cycles with a length", String(st.n));
+  if (st.mean) {
+    line("expected length", st.mean.toFixed(1) + " days");
+    line("plain average", st.plain.toFixed(1) + " days");
+    line("spread used for the range", st.predSd.toFixed(1) + " days");
+    line("shortest and longest", st.min + " to " + st.max + " days");
+  }
+  if (st.periodMean) line("bleeding days", st.periodMean.toFixed(1) + " on average");
+  if (st.pred) line("next start, likely range", D.human(st.lo) + " to " + D.human(st.hi));
+
+  const t = $("trendHost"); t.innerHTML = "";
+  trends().forEach(x => { const c = el("span", { class: "chip " + x.kind }); c.textContent = x.text; t.appendChild(c); });
+  t.appendChild(el("p", { class: "dim", style: "font-size:.88em;margin-top:.6em", text: "These are observations about your own record, worth raising with a clinician if they match what you are noticing. They are not a diagnosis." }));
+
+  const tb = $("cycTable").querySelector("tbody"); tb.innerHTML = "";
+  st.cycles.slice().reverse().forEach(c => {
+    const tr = el("tr");
+    [D.human(c.start), c.len ? c.len + " days" : "in progress", String(c.bleedDays), c.peak ? FLOWS[c.peak][1] : "none", c.recalled ? "from memory" : "recorded"]
+      .forEach(v => tr.appendChild(el("td", { text: v })));
+    tb.appendChild(tr);
+  });
+}
+function drawArchive() {
+  const host = $("archHost"); host.innerHTML = "";
+  const d = days();
+  const arch = Object.keys(d).filter(k => d[k].x).sort().reverse();
+  if (!arch.length) { host.appendChild(el("p", { class: "dim", text: "Nothing archived. Days you archive stay here rather than being destroyed." })); return; }
+  arch.forEach(iso => {
+    const row = el("div", { class: "row", style: "margin-bottom:8px;align-items:center" });
+    row.appendChild(el("span", { class: "mono", text: D.human(iso) }));
+    const b = el("button", { type: "button", text: "Bring it back" });
+    b.addEventListener("click", async () => { setDay(iso, { x: false }); await persist(); refresh(); toast("Restored " + D.human(iso)); });
+    row.appendChild(b);
+    host.appendChild(row);
+  });
+}
+function drawSymEdit() {
+  const host = $("symEdit"); host.innerHTML = "";
+  symList().forEach(({ k, name }) => {
+    const row = el("div", { class: "symrow" });
+    const inp = el("input", { type: "text", value: name, "aria-label": "Name for " + k });
+    inp.dataset.k = k;
+    const rm = el("button", { type: "button", text: "Remove" });
+    rm.addEventListener("click", () => row.remove());
+    row.appendChild(inp); row.appendChild(rm); host.appendChild(row);
+  });
+}
+function addSymRow() {
+  const row = el("div", { class: "symrow" });
+  const inp = el("input", { type: "text", value: "", placeholder: "what you want to watch" });
+  inp.dataset.k = "s" + Math.random().toString(36).slice(2, 7);
+  const rm = el("button", { type: "button", text: "Remove" });
+  rm.addEventListener("click", () => row.remove());
+  row.appendChild(inp); row.appendChild(rm); $("symEdit").appendChild(row);
+  inp.focus();
+}
+async function saveSyms() {
+  const rows = [...$("symEdit").querySelectorAll("input")];
+  const syms = rows.map(i => ({ k: i.dataset.k, name: i.value.trim() })).filter(s => s.name);
+  if (!syms.length) { toast("Keep at least one"); return; }
+  S.data.syms = syms;
+  await persist();
+  buildEditor(); if (S.selDate) selectDay(S.selDate);
+  toast("Symptom list saved");
+}
+
+/* ---------- copies in and out ---------- */
+function download(name, text, mime) {
+  const blob = new Blob([text], { type: mime || "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = el("a", { href: url, download: name });
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+function pickFile(accept, cb) {
+  const inp = el("input", { type: "file", accept, class: "hide" });
+  document.body.appendChild(inp);
+  inp.addEventListener("change", () => { const f = inp.files[0]; if (f) { const r = new FileReader(); r.onload = () => { cb(String(r.result)); inp.remove(); }; r.readAsText(f); } else inp.remove(); });
+  inp.click();
+}
+function exportSealed() {
+  const f = rawRead();
+  if (!f) { toast("Nothing to copy"); return; }
+  download("ephemeris-" + D.today() + ".ephemeris", JSON.stringify(f), "application/octet-stream");
+  toast("Sealed copy saved. It needs the passphrase to open.");
+}
+function importSealed() {
+  pickFile(".ephemeris,application/json,.json", (txt) => {
+    let f; try { f = JSON.parse(txt); } catch (e) { toast("That file is not a sealed copy"); return; }
+    if (!f || f.f !== "eph" || !f.vols) { toast("That file is not a sealed copy"); return; }
+    if (f.v !== 2) { toast("That copy came from an older version. Open it there and save a plain copy instead."); return; }
+    if (!confirm("This replaces what is on this device with the copy from the file. Anything here that is not in that copy is gone. Continue?")) return;
+    rawWrite(f); lock(); toast("Copy loaded. Open it with its own passphrase.");
+  });
+}
+function exportPlain() {
+  if (!confirm("A plain copy can be read by anything that touches it. Save it anyway?")) return;
+  const d = days(), syms = symList();
+  const head = ["date", "flow", "bleeding", ...syms.map(s => s.k), "temp", "mucus", "lh", "meds", "test", "source", "note"];
+  const rows = [head.join(",")];
+  Object.keys(d).sort().forEach(iso => {
+    const r = d[iso];
+    if (r.x) return;
+    const cells = [iso, String(r.f || 0), FLOWS[r.f || 0][1],
+      ...syms.map(s => String((r.s && r.s[s.k]) || 0)),
+      r.t != null ? String(r.t) : "", r.m != null ? String(r.m) : "", r.l != null ? String(r.l) : "",
+      r.med || "", r.tst || "", r.r ? "memory" : "recorded", (r.n || "").replace(/[\r\n]+/g, " ")];
+    rows.push(cells.map(c => /[",]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c).join(","));
+  });
+  download("ephemeris-plain-" + D.today() + ".csv", rows.join("\n"), "text/csv");
+  toast("Plain copy saved. Handle it carefully.");
+}
+function splitCsvLine(line) {
+  const out = []; let cur = "", q = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (q) { if (ch === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += ch; }
+    else if (ch === '"') q = true;
+    else if (ch === ",") { out.push(cur); cur = ""; }
+    else cur += ch;
+  }
+  out.push(cur); return out;
+}
+/* Bringing a record in.
+   Clue and Flo both hand out JSON, and neither of them says where a cycle
+   started, so starts are derived here from the bleeding days. Shapes drift
+   between vendors and between versions, so nothing is hardcoded to a schema:
+   the file is sniffed, columns are guessed, and the guess is shown before
+   anything is written. */
+const FLOW_WORDS = [
+  [/heav|strong|abundant|4/, 4], [/medium|moderate|normal|3/, 3],
+  [/light|2/, 2], [/spot|drop|trace|1/, 1], [/none|no flow|0/, 0]
+];
+function flowFromValue(v) {
+  if (v == null) return null;
+  if (typeof v === "boolean") return v ? 3 : null;
+  if (typeof v === "number") return v >= 0 && v <= 4 ? Math.round(v) : null;
+  const t = String(v).trim().toLowerCase();
+  if (!t) return null;
+  if (/^(y|yes|true)$/.test(t)) return 3;
+  if (/^(n|no|false)$/.test(t)) return null;
+  for (const [re, val] of FLOW_WORDS) if (re.test(t)) return val;
+  return null;
+}
+function isoFromValue(v) {
+  if (v == null) return null;
+  if (typeof v === "number" && v > 10 ** 11) { const d = new Date(v); return isNaN(d) ? null : D.iso(d); }
+  const t = String(v).trim();
+  let m = t.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return m[1] + "-" + m[2] + "-" + m[3];
+  m = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (m) return m[3] + "-" + String(m[1]).padStart(2, "0") + "-" + String(m[2]).padStart(2, "0");
+  return null;
+}
+function rowsFromCsv(text) {
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) return null;
+  const head = splitCsvLine(lines[0]).map(h => h.trim());
+  const rows = lines.slice(1).map(splitCsvLine);
+  return { head, rows };
+}
+function guessCols(head) {
+  const low = head.map(h => h.toLowerCase());
+  let date = low.findIndex(h => /^date$|^day$|start|timestamp/.test(h));
+  if (date < 0) date = low.findIndex(h => /date|day/.test(h));
+  let flow = low.findIndex(h => /^flow$|period|menstrua|bleed|intensity/.test(h));
+  return { date, flow };
+}
+/* walk any JSON and pull out every object that carries a date and something
+   that reads as a flow. Works on Clue's day list, on Flo's export, and on
+   anything else shaped like a list of days. */
+function daysFromJson(root) {
+  const found = [];
+  const seen = new Set();
+  const flowKey = /flow|period|menstrua|bleed/i;
+  const dateKey = /date|day|timestamp|time$/i;
+  (function walk(node, depth) {
+    if (!node || depth > 8) return;
+    if (Array.isArray(node)) { node.forEach(n => walk(n, depth + 1)); return; }
+    if (typeof node !== "object") return;
+    let iso = null, flow = null;
+    for (const k in node) {
+      const v = node[k];
+      if (v && typeof v === "object") continue;
+      if (iso === null && dateKey.test(k)) iso = isoFromValue(v);
+      if (flow === null && flowKey.test(k)) flow = flowFromValue(v);
+    }
+    /* Clue style: a tag list or a value under a key naming the flow itself */
+    if (iso && flow === null) {
+      for (const k in node) {
+        if (!flowKey.test(k)) continue;
+        const v = node[k];
+        if (Array.isArray(v)) for (const item of v) { const f = flowFromValue(item && item.value != null ? item.value : item); if (f) { flow = f; break; } }
+      }
+    }
+    if (iso && flow) { const key = iso + ":" + flow; if (!seen.has(key)) { seen.add(key); found.push({ iso, flow }); } }
+    for (const k in node) if (node[k] && typeof node[k] === "object") walk(node[k], depth + 1);
+  })(root, 0);
+  return found;
+}
+/* Apple Health exports one XML record per entry. Only menstrual flow is read
+   and nothing else in the file is touched. */
+function daysFromHealthXml(text) {
+  const out = [], seen = new Set();
+  const re = /<Record[^>]*type="HKCategoryTypeIdentifierMenstrualFlow"[^>]*>/g;
+  let m;
+  while ((m = re.exec(text))) {
+    const tag = m[0];
+    const d = (tag.match(/startDate="([^"]+)"/) || [])[1];
+    const v = (tag.match(/value="([^"]+)"/) || [])[1] || "";
+    const iso = isoFromValue(d);
+    if (!iso) continue;
+    let flow = 3;
+    if (/Unspecified/i.test(v)) flow = 3;
+    else if (/Light/i.test(v)) flow = 2;
+    else if (/Heavy/i.test(v)) flow = 4;
+    else if (/Medium|Moderate/i.test(v)) flow = 3;
+    else if (/None/i.test(v)) continue;
+    if (seen.has(iso)) continue;
+    seen.add(iso); out.push({ iso, flow });
+  }
+  return out;
+}
+const IMP = { pending: null, csv: null };
+function importPlain() {
+  pickFile(".csv,.json,.xml,.txt,text/csv,application/json,text/xml,text/plain", (txt) => {
+    const st = $("impState");
+    $("impMap").classList.add("hide");
+    IMP.pending = null; IMP.csv = null;
+    const head = txt.slice(0, 400).trim();
+    try {
+      if (head.startsWith("{") || head.startsWith("[")) {
+        const found = daysFromJson(JSON.parse(txt));
+        if (!found.length) { st.className = "err"; st.textContent = "That file parsed, but nothing in it reads as a day with bleeding on it. If you know which field holds it, save the file as a table instead and bring that in."; return; }
+        offerImport(found, "JSON export");
+        return;
+      }
+      if (/^<\?xml|<HealthData/i.test(head)) {
+        const found = daysFromHealthXml(txt);
+        if (!found.length) { st.className = "err"; st.textContent = "No menstrual flow records were found in that Apple Health export."; return; }
+        offerImport(found, "Apple Health export");
+        return;
+      }
+      const parsed = rowsFromCsv(txt);
+      if (!parsed) { st.className = "err"; st.textContent = "That file has no rows to read."; return; }
+      IMP.csv = parsed;
+      const guess = guessCols(parsed.head);
+      const fill = (sel, idx, allowNone) => {
+        sel.innerHTML = "";
+        if (allowNone) sel.appendChild(el("option", { value: "-1", text: "every row counts as bleeding" }));
+        parsed.head.forEach((h, i) => sel.appendChild(el("option", { value: String(i), text: h || "column " + (i + 1) })));
+        sel.value = String(idx);
+      };
+      fill($("mapDate"), guess.date < 0 ? 0 : guess.date, false);
+      fill($("mapFlow"), guess.flow, true);
+      $("impMap").classList.remove("hide");
+      st.className = "dim";
+      st.textContent = parsed.rows.length + " rows read. Check the two columns below before anything is written.";
+      previewCsv();
+    } catch (e) {
+      st.className = "err";
+      st.textContent = "That file could not be read: " + e.message;
+    }
+  });
+}
+function csvCandidates() {
+  if (!IMP.csv) return [];
+  const di = Number($("mapDate").value), fi = Number($("mapFlow").value);
+  const out = [], seen = new Set();
+  IMP.csv.rows.forEach(r => {
+    const iso = isoFromValue(r[di]);
+    if (!iso || seen.has(iso)) return;
+    const flow = fi < 0 ? 3 : flowFromValue(r[fi]);
+    if (!flow) return;
+    seen.add(iso); out.push({ iso, flow });
+  });
+  return out;
+}
+function previewCsv() {
+  const found = csvCandidates();
+  IMP.pending = found;
+  const host = $("impPreview"); host.innerHTML = "";
+  if (!found.length) { host.appendChild(el("p", { class: "err", text: "Nothing readable with those two columns. Try different ones." })); return; }
+  host.appendChild(el("p", { class: "dim", text: found.length + " days read. The first few:" }));
+  found.slice(0, 5).forEach(f => host.appendChild(el("div", { text: D.human(f.iso) + "   " + FLOWS[f.flow][1] })));
+}
+function offerImport(found, what) {
+  IMP.pending = found;
+  const host = $("impPreview"); host.innerHTML = "";
+  $("mapDate").innerHTML = ""; $("mapFlow").innerHTML = "";
+  $("mapDate").parentElement.classList.add("hide");
+  $("mapFlow").parentElement.classList.add("hide");
+  host.appendChild(el("p", { class: "dim", text: found.length + " days read from that " + what + ". The first few:" }));
+  found.slice(0, 5).forEach(f => host.appendChild(el("div", { text: D.human(f.iso) + "   " + FLOWS[f.flow][1] })));
+  $("impMap").classList.remove("hide");
+  $("impState").className = "dim";
+  $("impState").textContent = "Check these look right before anything is written.";
+}
+async function commitImport() {
+  const found = IMP.pending || [];
+  let made = 0, already = 0;
+  found.forEach(f => {
+    if (dayOf(f.iso)) { already++; return; }
+    setDay(f.iso, { f: f.flow, r: true, x: false });
+    made++;
+  });
+  await persist(); refresh();
+  $("impMap").classList.add("hide");
+  $("mapDate").parentElement.classList.remove("hide");
+  $("mapFlow").parentElement.classList.remove("hide");
+  IMP.pending = null; IMP.csv = null;
+  const st = $("impState");
+  st.className = "dim";
+  st.textContent = made + " days brought in and marked as recalled. " + already + " were already in the record and were left alone. Cycle starts were worked out from the bleeding days.";
+  toast(made + " days brought in");
+}
+function cancelImport() {
+  IMP.pending = null; IMP.csv = null;
+  $("impMap").classList.add("hide");
+  $("mapDate").parentElement.classList.remove("hide");
+  $("mapFlow").parentElement.classList.remove("hide");
+  $("impState").textContent = "";
+}
+/* The paper log. Printed at true size: the chart is laid out in millimetres so
+   a clinician can measure it, and a calibration bar on the page shows whether
+   the printer scaled it. Nothing identifies the person unless they type a name. */
+function paperHtml(opt) {
+  const o = Object.assign({ size: "letter", name: "", notes: 0, blank: 6 }, opt || {});
+  const st = stats(), d = liveDays();
+  const DAYS = 40, COL = 4, ROW = 6, LBL = 26;
+  const page = o.size === "a4" ? "A4" : "letter";
+  const cy = st.cycles.slice(-18);
+  const esc = t => String(t).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+
+  let chart = "";
+  chart += '<div class="scale">';
+  for (let i = 0; i <= DAYS; i += 5) chart += '<span class="tick" style="left:' + (LBL + i * COL) + 'mm">' + (i + 1) + '</span>';
+  chart += '</div>';
+  cy.slice().reverse().forEach(c => {
+    chart += '<div class="crow"><span class="clbl">' + D.human(c.start) + (c.recalled ? " *" : "") + '</span>';
+    for (let n = 0; n < DAYS; n++) {
+      const r = d[D.add(c.start, n)];
+      const f = r ? (r.f || 0) : 0;
+      const within = c.len ? n < c.len : true;
+      chart += '<span class="cell f' + f + (within ? "" : " out") + '"></span>';
+    }
+    chart += '</div>';
+  });
+  for (let i = 0; i < Number(o.blank || 0); i++) {
+    chart += '<div class="crow blank"><span class="clbl">&nbsp;</span>';
+    for (let n = 0; n < DAYS; n++) chart += '<span class="cell f0"></span>';
+    chart += '</div>';
+  }
+
+  const rows = cy.slice().reverse().map(c =>
+    "<tr><td>" + D.human(c.start) + "</td><td>" + (c.len ? c.len : "in progress") + "</td><td>" + c.bleedDays +
+    "</td><td>" + (c.peak ? FLOWS[c.peak][1] : "none") + "</td><td>" + (c.recalled ? "recalled" : "recorded") + "</td></tr>").join("");
+
+  const symTally = {};
+  symList().forEach(sm => { symTally[sm.k] = { name: sm.name, marked: 0, severe: 0 }; });
+  Object.values(d).forEach(r => {
+    if (!r.s) return;
+    for (const k in r.s) { if (!symTally[k]) continue; if (r.s[k] > 0) symTally[k].marked++; if (r.s[k] >= 3) symTally[k].severe++; }
+  });
+  const symRows = Object.values(symTally).filter(t => t.marked)
+    .map(t => "<tr><td>" + esc(t.name) + "</td><td>" + t.marked + " days</td><td>" + t.severe + " marked severe</td></tr>").join("")
+    || "<tr><td colspan='3'>Nothing recorded</td></tr>";
+
+  const meds = {};
+  Object.values(d).forEach(r => { if (r.med) meds[r.med] = (meds[r.med] || 0) + 1; });
+  const medRows = Object.keys(meds).sort().map(m => "<tr><td>" + esc(m) + "</td><td>" + meds[m] + " days</td></tr>").join("")
+    || "<tr><td colspan='2'>Nothing recorded</td></tr>";
+
+  let noteRows = "";
+  if (Number(o.notes)) {
+    noteRows = Object.keys(d).sort().reverse().filter(k => d[k].n || d[k].tst).slice(0, 40)
+      .map(iso => "<tr><td>" + D.human(iso) + "</td><td>" + esc([d[iso].tst, d[iso].n].filter(Boolean).join("; ")) + "</td></tr>").join("");
+  }
+
+  const summary = [
+    st.n + " cycles with a measured length",
+    st.mean ? "expected length " + st.mean.toFixed(1) + " days" : null,
+    st.predSd ? "spread " + st.predSd.toFixed(1) + " days" : null,
+    st.min ? "range " + st.min + " to " + st.max + " days" : null,
+    st.periodMean ? "bleeding " + st.periodMean.toFixed(1) + " days on average" : null
+  ].filter(Boolean).join(", ");
+
+  return "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Cycle log</title><style>" +
+    "@page{size:" + page + " portrait;margin:12mm}" +
+    "html,body{margin:0;padding:0;color:#000;background:#fff;font:10pt Georgia,'Times New Roman',serif}" +
+    "body{width:" + (page === "A4" ? 186 : 191) + "mm}" +
+    "h1{font-size:15pt;margin:0 0 1mm}h2{font-size:11pt;margin:6mm 0 2mm;border-bottom:.3mm solid #000;padding-bottom:1mm}" +
+    "p{margin:0 0 2mm}.small{font-size:8pt;color:#333}" +
+    ".cal{margin:2mm 0 1mm;position:relative;height:5mm}" +
+    ".scale{position:relative;height:4mm;font-size:7pt}" +
+    ".tick{position:absolute;top:0}" +
+    ".crow{height:" + ROW + "mm;white-space:nowrap;font-size:0}" +
+    ".clbl{display:inline-block;width:" + LBL + "mm;height:" + ROW + "mm;font-size:7pt;line-height:" + ROW + "mm;vertical-align:top}" +
+    ".cell{display:inline-block;width:" + COL + "mm;height:" + (ROW - 1) + "mm;border:.2mm solid #ccc;border-left:0;vertical-align:top;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}" +
+    ".cell.out{border-color:#eee}" +
+    ".f1{background:#ddd}.f2{background:#999}.f3{background:#555}.f4{background:#000}" +
+    "table{width:100%;border-collapse:collapse;margin:2mm 0}" +
+    "th,td{border-bottom:.2mm solid #999;text-align:left;padding:1mm 1.5mm;font-size:8.5pt}" +
+    "th{font-size:7.5pt;text-transform:uppercase;letter-spacing:.4pt}" +
+    ".ruler{margin:3mm 0;height:6mm;position:relative;border-left:.3mm solid #000;border-right:.3mm solid #000;width:100mm;border-bottom:.3mm solid #000}" +
+    ".ruler span{position:absolute;bottom:0;border-left:.2mm solid #000;height:2mm}" +
+    ".foot{font-size:7.5pt;color:#333;margin-top:6mm;border-top:.2mm solid #999;padding-top:2mm}" +
+    "</style></head><body>" +
+    "<h1>Cycle log</h1>" +
+    (o.name ? "<p>" + esc(o.name) + "</p>" : "") +
+    "<p class='small'>Prepared " + D.human(D.today()) + ". " + summary + ".</p>" +
+    "<h2>Cycles at true size</h2>" +
+    "<p class='small'>One square is one day. Columns are numbered from the first day of each cycle. Shading runs from spotting, palest, to heavy, solid. A star marks a cycle filled in from memory rather than recorded at the time.</p>" +
+    chart +
+    "<div class='ruler'><span style='left:10mm'></span><span style='left:20mm'></span><span style='left:30mm'></span><span style='left:40mm'></span><span style='left:50mm'></span><span style='left:60mm'></span><span style='left:70mm'></span><span style='left:80mm'></span><span style='left:90mm'></span></div>" +
+    "<p class='small'>The bar above is 100 mm. If it measures anything else, the printer scaled the page and the chart is not at true size.</p>" +
+    "<h2>Cycle table</h2><table><thead><tr><th>Start</th><th>Length</th><th>Bleeding days</th><th>Peak</th><th>Source</th></tr></thead><tbody>" + rows + "</tbody></table>" +
+    "<h2>Symptoms</h2><table><tbody>" + symRows + "</tbody></table>" +
+    "<h2>Medication recorded</h2><table><tbody>" + medRows + "</tbody></table>" +
+    (noteRows ? "<h2>Notes and results</h2><table><tbody>" + noteRows + "</tbody></table>" : "") +
+    "<p class='foot'>Printed from a personal record kept on the patient's own device. Cycle starts are derived from recorded bleeding days. Predicted ranges cover about four times in five. This is a personal record, not a clinical document.</p>" +
+    "</body></html>";
+}
+function printLog() {
+  const html = paperHtml({
+    size: $("pgSize").value, name: $("pgName").value.trim(),
+    notes: $("pgNotes").value, blank: $("pgBlank").value
+  });
+  const w = window.open("", "_blank");
+  if (!w) { toast("The browser blocked the print window"); return; }
+  w.document.write(html);
+  w.document.close(); w.focus();
+  setTimeout(() => w.print(), 300);
+}
+
+/* ---------- safety station ---------- */
+function drawSafety() {
+  const sf = S.data.safety || (S.data.safety = { upkeep: 1, deadDays: 0, lastOpen: D.today(), acked: 0 });
+  if (sf.acked) { $("safeLocked").classList.add("hide"); $("safeOpen").classList.remove("hide"); }
+  $("setUpkeep").value = String(sf.upkeep ? 1 : 0);
+  $("setDead").value = String(sf.deadDays || 0);
+  const dk = S.data.decoy;
+  $("upkeepState").textContent = dk && dk.key
+    ? "Second record last carried forward " + (dk.last ? D.human(dk.last) : "not yet") + "."
+    : "This record is the second one. These settings belong to the other.";
+  $("deadState").textContent = sf.deadDays
+    ? "Erases if this record is not opened for " + sf.deadDays + " days. Last opened " + D.human(sf.lastOpen || D.today()) + "."
+    : "Off. The record stays until you remove it.";
+  $("wpState").textContent = (S.file && S.file.w && S.file.w.set) ? "A wipe passphrase is set." : "No wipe passphrase is set.";
+}
+async function setWipePass() {
+  const a = $("wp1").value, b = $("wp2").value, st = $("wpState");
+  st.className = "err";
+  if (S.data.role !== "real") { st.textContent = "This can only be set from the main record."; return; }
+  if (a.length < 8) { st.textContent = "Use at least 8 characters."; return; }
+  if (a !== b) { st.textContent = "The two entries do not match."; return; }
+  const K = await deriveAll(a, b64.dec(S.file.s), S.file.kdf);
+  if (sameVfy(K.vfy, S.file.vols[0].vfy) || sameVfy(K.vfy, S.file.vols[1].vfy)) { st.textContent = "That is already one of your passphrases."; return; }
+  const decoyIdx = S.data.decoy ? S.data.decoy.idx : (1 - S.slot);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, K.wipe, new Uint8Array([decoyIdx]));
+  const joined = new Uint8Array(12 + ct.byteLength);
+  joined.set(iv); joined.set(new Uint8Array(ct), 12);
+  S.file.w = { vfy: K.vfy, x: b64.enc(joined), set: 1 };
+  rawWrite(S.file);
+  $("wp1").value = $("wp2").value = "";
+  st.className = "err";
+  st.textContent = "Set. Entering it destroys this record at once and reports a wrong passphrase.";
+  drawSafety();
+}
+async function clearWipePass() {
+  S.file.w = { vfy: b64.enc(crypto.getRandomValues(new Uint8Array(16))), x: b64.enc(crypto.getRandomValues(new Uint8Array(28))) };
+  rawWrite(S.file);
+  $("wpState").className = "dim";
+  $("wpState").textContent = "Removed.";
+  drawSafety();
+}
+async function safetyChanged() {
+  const sf = S.data.safety;
+  sf.upkeep = Number($("setUpkeep").value);
+  const days = Number($("setDead").value);
+  if (days && !sf.deadDays && !confirm("If this record is not opened for " + days + " days, it erases itself the next time it is opened. There is no recovery. Turn it on?")) { $("setDead").value = "0"; return; }
+  sf.deadDays = days;
+  sf.lastOpen = D.today();
+  await persist(); drawSafety();
+}
+
+/* ---------- settings ---------- */
+const THEME_NAMES = { auto: "Follow", day: "Light", night: "Dark", hc: "Contrast" };
+/* A stored theme of auto means follow the device, which is also what the gate
+   uses, since a preference cannot be read before the record is open. */
+function resolveTheme(choice) {
+  if (choice && choice !== "auto") return choice;
+  const ask = (q) => typeof matchMedia === "function" && matchMedia(q).matches;
+  if (ask("(prefers-contrast: more)")) return "hc";
+  return ask("(prefers-color-scheme: light)") ? "day" : "night";
+}
+function paintTheme(choice) {
+  document.documentElement.setAttribute("data-theme", resolveTheme(choice));
+  const b = $("btnTheme");
+  if (b) { b.textContent = THEME_NAMES[choice || "auto"]; b.setAttribute("aria-label", "Look: " + THEME_NAMES[choice || "auto"] + ". Press to change."); }
+}
+async function cycleTheme() {
+  const order = ["auto", "day", "night", "hc"];
+  const now = (S.data && S.data.prefs && S.data.prefs.theme) || "auto";
+  const next = order[(order.indexOf(now) + 1) % order.length];
+  S.data.prefs = S.data.prefs || {};
+  S.data.prefs.theme = next;
+  await persist();
+  applyPrefs();
+  toast(next === "auto" ? "Following this device" : "Look: " + THEME_NAMES[next]);
+}
+function applyPrefs() {
+  const p = S.data.prefs || {};
+  paintTheme(p.theme || "auto");
+  $("setTheme").value = p.theme || "auto";
+  $("setIdle").value = String(p.idle != null ? p.idle : 180);
+  $("setBlur").value = String(p.lockOnBlur ? 1 : 0);
+  $("setDebug").value = S.debug ? "1" : "0";
+  $("edUnit").value = p.unit || "F";
+  $("logWrap").classList.toggle("hide", !S.debug);
+  touchIdle();
+}
+async function prefChanged() {
+  S.data.prefs = S.data.prefs || {};
+  S.data.prefs.theme = $("setTheme").value;
+  S.data.prefs.idle = Number($("setIdle").value);
+  S.data.prefs.lockOnBlur = Number($("setBlur").value);
+  S.debug = $("setDebug").value === "1";
+  await persist(); applyPrefs();
+}
+
+/* ---------- self test ---------- */
+/* longest run of printable ASCII in a byte array. Ciphertext should never
+   carry more than a few by chance, and plaintext carries hundreds. */
+function longestReadableRun(bytes) {
+  let best = 0, run = 0;
+  for (let i = 0; i < bytes.length; i++) {
+    const c = bytes[i];
+    if (c >= 32 && c <= 126) { run++; if (run > best) best = run; } else run = 0;
+  }
+  return best;
+}
+function hex(b) { return Array.from(b).map(x => x.toString(16).padStart(2, "0")).join(""); }
+async function selfTest() {
+  const out = $("testOut"); out.textContent = "Running..."; await new Promise(r => setTimeout(r, 20));
+  const res = []; const t0 = Date.now();
+  const ok = (name, cond) => res.push({ name, pass: !!cond });
+  try {
+    /* the hand written hash and key derivation, against published vectors */
+    ok("BLAKE2b matches its published vector",
+      hex(blake2b(te("abc"), 64)) === "ba80a53f981c4d0d6a2797b69f12f6e94c212f14685ac4b74b12bb6fdbffa2d17d87c5392aab792dc252d5de4533cc9518d38aa8dbf1925ab92386edd4009923");
+    ok("BLAKE2b at 32 bytes matches",
+      hex(blake2b(te(""), 32)) === "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8");
+    ok("Argon2id matches vector A",
+      hex(argon2id(te("password"), te("somesalt16bytes"), { t: 2, m: 64, p: 1, dkLen: 32 })) === "372827f2bc6cc1a269c3091d41ccb1aa5dd843a6806162c65a636c4638305dec");
+    ok("Argon2id matches vector B",
+      hex(argon2id(te("p"), te("0123456789abcdef"), { t: 1, m: 32, p: 1, dkLen: 16 })) === "8b8f874edac5d79bceaa03b4777eb0b0");
+    ok("Argon2id matches vector C",
+      hex(argon2id(te("correct horse battery staple"), te("ephemeris-test16"), { t: 3, m: 128, p: 1, dkLen: 32 })) === "fad649a2543c33f30f136f78178e230709832bec8770d357b50f3ef3b8854495");
+
+    /* one derivation, two verifiers */
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const kdf = { m: 8 * 1024, t: 1, p: 1 };
+    const A = await deriveAll("first passphrase", salt, kdf);
+    const B = await deriveAll("second passphrase", salt, kdf);
+    const A2 = await deriveAll("first passphrase", salt, kdf);
+    ok("the same passphrase gives the same verifier", sameVfy(A.vfy, A2.vfy));
+    ok("different passphrases give different verifiers", !sameVfy(A.vfy, B.vfy));
+    ok("the verifier is not the key", A.vfy !== await rawKeyOf(A.enc));
+    const vol = await sealWith(A.enc, Object.assign(blankRecord("real"), { probe: "x" }), PAD_MIN);
+    const back = await openWith(A.enc, vol);
+    ok("a volume opens under its own key", back.probe === "x");
+    let wrongFailed = false;
+    try { await openWith(B.enc, vol); } catch (e) { wrongFailed = true; }
+    ok("a volume refuses the other key", wrongFailed);
+    ok("padding hides the size", b64.dec(vol.c).length >= PAD_MIN);
+    ok("padding grows in fixed steps", padTarget(PAD_MIN + 1) === PAD_MIN + PAD_BLOCK);
+
+    /* wiping */
+    const fakeFile = { vols: [{ vfy: "a", i: "AA", c: b64.enc(new Uint8Array(1024)) }, { vfy: "b", i: "BB", c: b64.enc(new Uint8Array(1024)) }] };
+    const before = fakeFile.vols[0].c;
+    const saveWrite = window.__ephMem;
+    await destroySlot(fakeFile, 0);
+    window.__ephMem = saveWrite;
+    ok("wiping replaces a volume with noise", fakeFile.vols[0].c !== before && b64.dec(fakeFile.vols[0].c).length === 1024);
+    ok("wiping leaves the other volume alone", fakeFile.vols[1].c === b64.enc(new Uint8Array(1024)));
+
+    /* dates */
+    ok("dates add across a month end", D.add("2024-01-31", 1) === "2024-02-01");
+    ok("dates add across a leap day", D.add("2024-02-28", 1) === "2024-02-29");
+    ok("date differences are whole days", D.diff("2024-03-01", "2024-03-29") === 28);
+    ok("spring forward does not shift a day", D.add("2024-03-09", 1) === "2024-03-10");
+
+    /* the model, on a scratch record */
+    const keep = S.data;
+    S.data = blankRecord("real");
+    ["2024-01-01", "2024-01-02", "2024-01-03"].forEach(d => setDay(d, { f: 3 }));
+    ["2024-01-29", "2024-01-30"].forEach(d => setDay(d, { f: 3 }));
+    ["2024-02-26", "2024-02-27"].forEach(d => setDay(d, { f: 3 }));
+    let cy = cycles();
+    ok("cycles are found from bleeding days", cy.length === 3);
+    ok("cycle length is measured start to start", cy[0].len === 28);
+    setDay("2024-01-15", { f: 1 });
+    cy = cycles();
+    ok("spotting alone does not open a cycle", cy.length === 3);
+    setDay("2024-02-24", { f: 1 });
+    cy = cycles();
+    ok("spotting before a period does not move the start", cy.length === 3 && cy[2].start === "2024-02-26");
+
+    /* prediction */
+    const one = predict([{ start: "2024-01-01", len: 28, recalled: false }]);
+    ok("one cycle leans on the prior", one.mean > 28 && one.mean < 29.1);
+    ok("one cycle gives a wide spread", one.predSd > 3.5);
+    const many = predict(Array.from({ length: 12 }, (_, i) => ({ start: "2024-01-01", len: 28, recalled: false })));
+    ok("many cycles pull toward what was recorded", Math.abs(many.mean - 28) < 0.4);
+    ok("many cycles narrow the spread", many.predSd < one.predSd);
+    const recalledOnly = predict(Array.from({ length: 6 }, () => ({ len: 24, recalled: true })));
+    const recordedOnly = predict(Array.from({ length: 6 }, () => ({ len: 24, recalled: false })));
+    ok("recalled cycles count for less", Math.abs(recalledOnly.mean - 29) < Math.abs(recordedOnly.mean - 29));
+    ok("an empty record predicts nothing", predict([]).mean === null);
+
+    /* placement and trends */
+    const pl = placement({ last: D.add(D.today(), -29), mean: 28, predSd: 3 });
+    ok("placement reports where today sits", pl.pct > 50 && pl.pct <= 100 && pl.dayOfCycle === 30);
+    S.data = blankRecord("real");
+    [0, 26, 54, 84, 116, 150].forEach((off, i) => {
+      for (let n = 0; n < 4; n++) setDay(D.add("2024-01-01", off + n), { f: 3 });
+    });
+    const tr = trends();
+    ok("a drifting cycle length is noticed", tr.some(x => /lengthening/.test(x.text)));
+    S.data = blankRecord("real");
+    ok("a thin record says so rather than guessing", trends().some(x => /Not enough cycles/.test(x.text)));
+    S.data = keep;
+
+    /* passphrase strength */
+    ok("a common word is called out", strength("password1").score === 0);
+    ok("a short passphrase scores low", strength("Tr0ub4d").score <= 2);
+    ok("four unrelated words score well", strength("copper lantern drift almanac").score >= 3);
+    ok("repeats do not fool the meter", strength("aaaaaaaaaaaaaaaaaaaa").score === 1);
+
+    /* copies */
+    ok("plain rows split on real commas", splitCsvLine('2024-01-01,3,"a, b",x').length === 4);
+    ok("quoted commas stay inside the cell", splitCsvLine('2024-01-01,3,"a, b",x')[2] === "a, b");
+
+    /* bringing a record in */
+    ok("flow words map to the scale", flowFromValue("Heavy") === 4 && flowFromValue("light") === 2 && flowFromValue("spotting") === 1);
+    ok("a yes counts as bleeding", flowFromValue("yes") === 3 && flowFromValue(true) === 3);
+    ok("a no is not a day", flowFromValue("no") === null && flowFromValue("") === null);
+    ok("dates are read in both common orders", isoFromValue("2024-03-09T06:00:00Z") === "2024-03-09" && isoFromValue("3/9/2024") === "2024-03-09");
+    const clueish = { data: [{ day: "2024-01-01", period: "medium" }, { day: "2024-01-02", period: "light" }, { day: "2024-01-15", pain: "cramps" }] };
+    const fromClue = daysFromJson(clueish);
+    ok("a Clue shaped export yields days", fromClue.length === 2 && fromClue[0].iso === "2024-01-01" && fromClue[0].flow === 3);
+    ok("days with no bleeding are left out", !fromClue.some(f => f.iso === "2024-01-15"));
+    const floish = [{ date: "2024-02-01", menstrualFlow: 4 }, { date: "2024-02-02", menstrualFlow: 0 }];
+    ok("a differently shaped export still yields days", daysFromJson(floish).length === 1);
+    ok("nested structures are walked", daysFromJson({ a: { b: { c: [{ date: "2024-04-01", period: "heavy" }] } } }).length === 1);
+    const hx = '<HealthData><Record type="HKCategoryTypeIdentifierMenstrualFlow" startDate="2024-05-01 08:00:00 -0400" value="HKCategoryValueMenstrualFlowHeavy"/>' +
+      '<Record type="HKCategoryTypeIdentifierMenstrualFlow" startDate="2024-05-02 08:00:00 -0400" value="HKCategoryValueMenstrualFlowLight"/>' +
+      '<Record type="HKQuantityTypeIdentifierStepCount" startDate="2024-05-02 08:00:00 -0400" value="900"/></HealthData>';
+    const fromHx = daysFromHealthXml(hx);
+    ok("an Apple Health export yields flow records", fromHx.length === 2 && fromHx[0].flow === 4 && fromHx[1].flow === 2);
+    ok("nothing else in a Health export is read", !fromHx.some(f => f.flow > 4));
+    const csv = rowsFromCsv("date,flow,mood\n2024-06-01,heavy,fine\n2024-06-02,light,tired\n");
+    ok("a table is split into head and rows", csv.head.length === 3 && csv.rows.length === 2);
+    ok("the date and flow columns are guessed", guessCols(csv.head).date === 0 && guessCols(csv.head).flow === 1);
+
+    /* the paper log */
+    const paper = paperHtml({ size: "a4", name: "", notes: 0, blank: 6 });
+    ok("the paper log is laid out in millimetres", /width:4mm/.test(paper) && /@page\{size:A4/.test(paper));
+    ok("the paper log carries a calibration bar", /width:100mm/.test(paper) && /100 mm/.test(paper));
+    ok("no name appears unless one is typed", !/<p>[^<]/.test(paper.split("<h1>Cycle log</h1>")[1].slice(0, 40)));
+    ok("a typed name does appear", /Someone/.test(paperHtml({ name: "Someone" })));
+    ok("notes stay off the sheet unless asked for", !/Notes and results/.test(paper));
+    ok("blank rows are added to carry on with", (paper.match(/crow blank/g) || []).length === 6);
+
+    /* the workflows that used to dead end */
+    const keepSel = S.selDate;
+    S.selDate = null;
+    S.selDate = null; $("edNote").value = "typed before a day was picked";
+    ensureDay();
+    ok("falling back to today does not throw away what was typed", S.selDate === D.today() && $("edNote").value === "typed before a day was picked");
+    S.selDate = keepSel;
+    ok("every station knows how to draw itself", STATIONS.every(n => typeof DRAW[n] === "function"));
+
+    /* Storage holds nothing readable. Short words are no good as a test here:
+       base64 can spell anything by chance, which is what made an earlier
+       version of this check fail once in a while for no reason. Look for the
+       markers that only ever appear in plaintext, and for any long run of
+       readable text inside a sealed volume. The threshold is 24 rather than
+       something tighter because random bytes do occasionally spell a dozen
+       printable characters, while real plaintext runs to hundreds. */
+    const stored = rawRead() || {};
+    const rawText = JSON.stringify(stored).replace(/"ver":"[^"]*"/, "");
+    ok("storage holds no plaintext structure", !/"days"|"syms"|"magic"|EPHEMERIS1/.test(rawText));
+    ok("storage holds no readable dates", !/\d{4}-\d{2}-\d{2}/.test(rawText));
+    ok("no volume holds a run of readable text", (stored.vols || []).every(v => longestReadableRun(b64.dec(v.c)) < 24));
+  } catch (e) {
+    res.push({ name: "the run itself finished: " + e.message, pass: false });
+  }
+  const bad = res.filter(r => !r.pass);
+  out.innerHTML = "";
+  out.appendChild(el("p", {
+    class: bad.length ? "err" : "ok",
+    text: (bad.length ? bad.length + " of " + res.length + " checks failed" : "all " + res.length + " checks passed") + ", in " + ((Date.now() - t0) / 1000).toFixed(1) + "s"
+  }));
+  res.forEach(r => out.appendChild(el("div", { class: r.pass ? "dim" : "err", text: (r.pass ? "pass  " : "FAIL  ") + r.name })));
+  window.__ephTest = { total: res.length, failed: bad.length, results: res };
+  return window.__ephTest;
+}
+
+/* ---------- shell ---------- */
+const STATIONS = ["dial", "log", "signals", "table", "record", "safety", "about"];
+/* one place that knows how to draw a station, used both when you switch to one
+   and when the record changes underneath the one you are looking at */
+const DRAW = {
+  dial: () => drawDial(),
+  log: () => drawCal(),
+  signals: () => drawBBT(),
+  table: () => drawTable(),
+  record: () => drawArchive(),
+  safety: () => drawSafety(),
+  about: () => {}
+};
+function current() { return STATIONS.find(s => !$("st-" + s).classList.contains("hide")) || "dial"; }
+function showStation(name) {
+  STATIONS.forEach(s => {
+    $("st-" + s).classList.toggle("hide", s !== name);
+    $("tab-" + s).setAttribute("aria-selected", String(s === name));
+  });
+  if (name === "record") drawSymEdit();
+  if (name === "signals" && !S.selDate) selectDay(D.today());
+  DRAW[name]();
+  touchIdle();
+}
+function refresh() { DRAW[current()](); touchIdle(); }
+function openApp() {
+  $("gate").classList.add("hide");
+  $("app").classList.remove("hide");
+  S.calMonth = D.today().slice(0, 7);
+  S.selDate = D.today();
+  buildEditor();
+  applyPrefs();
+  showStation("dial");
+  drawCal();
+  selectDay(S.selDate);
+  if (S.memoryOnly) toast("This browser is not letting the page store anything. Save a sealed copy before you close it.");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  $("btnCreate").addEventListener("click", createRecord);
+  $("btnUnlock").addEventListener("click", unlock);
+  $("pp").addEventListener("keydown", e => { if (e.key === "Enter") unlock(); });
+  $("pp2").addEventListener("keydown", e => { if (e.key === "Enter") createRecord(); });
+  $("pp1").addEventListener("input", () => {
+    const s = strength($("pp1").value);
+    const m = $("ppMeter");
+    m.className = "meter s" + s.score;
+    m.firstElementChild.style.width = Math.min(100, s.score * 25) + "%";
+    $("ppMeterLab").textContent = $("pp1").value ? s.say + " (about " + s.bits + " bits)" : "";
+  });
+  $("btnRestore").addEventListener("click", importSealed);
+  $("btnFresh").addEventListener("click", () => {
+    $("freshPanel").classList.toggle("hide");
+    if (!$("freshPanel").classList.contains("hide")) $("btnFreshBackup").focus();
+  });
+  $("btnFreshNo").addEventListener("click", () => $("freshPanel").classList.add("hide"));
+  $("recClear").addEventListener("click", () => askClear($("recClearHost")));
+  $("safeClear").addEventListener("click", () => askClear($("safeClearHost")));
+  $("btnFreshBackup").addEventListener("click", exportSealed);
+  $("btnFreshGo").addEventListener("click", () => {
+    if (!confirm("Clear this device and start a new record? What is here now can never be opened again.")) return;
+    startOver();
+  });
+  $("btnLock").addEventListener("click", lock);
+  STATIONS.forEach(s => $("tab-" + s).addEventListener("click", () => showStation(s)));
+  $("qStart").addEventListener("click", () => quick("start"));
+  $("qToday").addEventListener("click", () => quick("today"));
+  $("qEnd").addEventListener("click", () => quick("end"));
+  $("calPrev").addEventListener("click", () => { const d = D.parse(S.calMonth + "-01"); d.setUTCMonth(d.getUTCMonth() - 1); S.calMonth = D.iso(d).slice(0, 7); drawCal(); });
+  $("calNext").addEventListener("click", () => { const d = D.parse(S.calMonth + "-01"); d.setUTCMonth(d.getUTCMonth() + 1); S.calMonth = D.iso(d).slice(0, 7); drawCal(); });
+  document.addEventListener("pointerup", endPaint);
+  document.addEventListener("pointercancel", () => { S.painting = null; drawCal(); });
+  $("edSave").addEventListener("click", saveDay);
+  $("edClear").addEventListener("click", archiveDay);
+  $("bfGo").addEventListener("click", backfill);
+  $("sigSave").addEventListener("click", saveSignals);
+  $("sigDay").addEventListener("change", () => { if ($("sigDay").value) selectDay($("sigDay").value); });
+  $("sigToday").addEventListener("click", () => selectDay(D.today()));
+  $("expSealed").addEventListener("click", exportSealed);
+  $("impSealed").addEventListener("click", importSealed);
+  $("expPlain").addEventListener("click", exportPlain);
+  $("impPlain").addEventListener("click", importPlain);
+  $("impGo").addEventListener("click", commitImport);
+  $("impCancel").addEventListener("click", cancelImport);
+  ["mapDate", "mapFlow"].forEach(id => $(id).addEventListener("change", previewCsv));
+  $("btnPrint").addEventListener("click", printLog);
+  $("symAdd").addEventListener("click", addSymRow);
+  $("symSave").addEventListener("click", saveSyms);
+  $("btnSelfTest").addEventListener("click", selfTest);
+  ["setTheme", "setIdle", "setBlur", "setDebug"].forEach(id => $(id).addEventListener("change", prefChanged));
+  $("btnTheme").addEventListener("click", cycleTheme);
+  $("safeAck").addEventListener("click", async () => {
+    S.data.safety = S.data.safety || {}; S.data.safety.acked = 1; await persist(); drawSafety();
+    $("safeLocked").classList.add("hide"); $("safeOpen").classList.remove("hide");
+  });
+  ["setUpkeep", "setDead"].forEach(id => $(id).addEventListener("change", safetyChanged));
+  $("wpSet").addEventListener("click", setWipePass);
+  $("wpClear").addEventListener("click", clearWipePass);
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && S.key) { lock(); toast("Locked"); } });
+  ["pointerdown", "keydown"].forEach(ev => document.addEventListener(ev, () => { if (S.key) touchIdle(); }, { passive: true }));
+  window.addEventListener("blur", () => { if (S.key && S.data && S.data.prefs && S.data.prefs.lockOnBlur) { lock(); } });
+  document.addEventListener("visibilitychange", () => { if (document.hidden && S.key && S.data && S.data.prefs && S.data.prefs.lockOnBlur) lock(); });
+  boot();
+});
+window.__eph = { S, D, cycles, stats, predict, trends, placement, strength, selfTest, unlock, createRecord, lock, setDay, persist, deriveAll, sameVfy, blankRecord, seedDecoy, upkeepDecoy, rawRead, destroySlot, splitCsvLine, argon2id, startOver, askClear, resolveTheme, cycleTheme, paintTheme, longestReadableRun, DRAW, STATIONS, showStation, current, ensureDay, flowFromValue, isoFromValue, daysFromJson, daysFromHealthXml, rowsFromCsv, guessCols, paperHtml, commitImport, IMP, blake2b, backfill, quick };
+</script>
+</body>
+</html>
